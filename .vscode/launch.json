@@ -1,0 +1,20 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "PowerShell:",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${file}",
+            "args": []
+        },
+        {
+            "type": "bashdb",
+            "request": "launch",
+            "name": "Bash simple",
+            "cwd": "${workspaceFolder}",
+            "program": "${file}",
+            "terminalKind": "integrated"
+          }
+    ]
+}
