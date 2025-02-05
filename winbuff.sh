@@ -2,20 +2,21 @@
 
 # Проверка на Debian
 if ! grep -q "debian" /etc/os-release; then
-    echo "Этот скрипт предназначен только для Debian. Скрипт будет завершен."
+    echo "Этот скрипт предназначен только для Debian"
     exit 1
 fi
 
 # Проверка root прав
 if [[ $EUID -ne 0 ]]; then
-    echo "Этот скрипт должен быть запущен с правами root. Скрипт будет завершен."
+    echo "Этот скрипт должен быть запущен с правами root"
     exit 1
 fi
 
 # Выбор этапа выполнения
 echo "Выберите этап установки:"
-echo "1 - Установка необходимых пакетов и системных настроек"
-echo "2 - Установка и настройка Zabbix"
+echo "1 - Первичная настрока"
+echo "2 - Zabbix"
+echo "3 - Настройка автообновления"
 read -p "Введите номер этапа: " stage
 
 if [[ "$stage" == "1" ]]; then
@@ -25,7 +26,7 @@ if [[ "$stage" == "1" ]]; then
     apt-get update && apt-get upgrade -y
     apt update && apt dist-upgrade -y
     apt-get autoremove -y && apt-get clean -y
-    apt-get install -y sudo curl wget lnav htop mc whois gnupg2 ncdu || { echo "Ошибка при установке пакетов"; exit 1; }
+    apt-get install -y sudo curl wget lnav htop mc whois gnupg2 ncdu console-cyrillic
 
     # История команд с временем
     echo "Настройка формата истории команд с временем..."
@@ -43,16 +44,15 @@ if [[ "$stage" == "1" ]]; then
     echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
     sysctl -p || { echo "Ошибка при применении sysctl"; exit 1; }
 
-    # Мена языка mc на русский
-    echo "Настройка языка для mc..."
-    apt install console-cyrillic -y || { echo "Ошибка при установке console-cyrillic"; exit 1; }
-    dpkg-reconfigure locales || { echo "Ошибка при перезагрузке локалей"; exit 1; }
-
     # Отключение IPv6
     echo "Отключаем IPv6..."
     echo "net.ipv6.conf.all.disable_ipv6 = 1" > /etc/sysctl.d/disable-ipv6.conf
     echo "net.ipv6.conf.default.disable_ipv6 = 1" >> /etc/sysctl.d/disable-ipv6.conf
-    sysctl --system || { echo "Ошибка при применении настроек IPv6"; exit 1; }
+    sysctl --system
+
+    # Настройка sudo без пароля для пользователя tech
+    echo "Настраиваем sudo для пользователя tech без пароля..."
+    echo "tech    ALL=(ALL)    NOPASSWD:ALL" >> /etc/sudoers
 
     echo "Этап 1 завершен!"
     exit 0
@@ -66,7 +66,7 @@ if [[ "$stage" == "2" ]]; then
     # Переменные для установки Zabbix
     ZABBIX_VERSION="7.0"
     DEBIAN_VERSION=$(lsb_release -sc)
-    ZABBIX_SERVER="192.168.103.251"  # Укажите IP вашего Zabbix сервера
+    ZABBIX_SERVER="192.168.103.251"
     HOSTNAME=$(hostname)
 
     # Добавление репозитория Zabbix
@@ -79,7 +79,7 @@ if [[ "$stage" == "2" ]]; then
 
     # Установка Zabbix агента
     echo "Устанавливаем Zabbix агент"
-    apt install -y zabbix-agent || { echo "Ошибка при установке Zabbix агента"; exit 1; }
+    apt install -y zabbix-agent2 || { echo "Ошибка при установке Zabbix агента"; exit 1; }
 
     # Настройка Zabbix агента
     echo "Настраиваем Zabbix агент"
@@ -99,4 +99,19 @@ if [[ "$stage" == "2" ]]; then
     exit 0
 fi
 
-echo "Некорректный выбор. Запустите скрипт снова и введите 1 или 2."
+if [[ "$stage" == "3" ]]; then
+    echo "Настраиваем автоматическое обновление..."
+    apt update
+    apt install unattended-upgrades -y
+    dpkg-reconfigure -f noninteractive unattended-upgrades
+    echo 'APT::Periodic::Update-Package-Lists "1";' > /etc/apt/apt.conf.d/20auto-upgrades
+    echo 'APT::Periodic::Unattended-Upgrade "1";' >> /etc/apt/apt.conf.d/20auto-upgrades
+    echo 'Unattended-Upgrade::Remove-Unused-kernel-Packages "true";' >> /etc/apt/apt.conf.d/50unattended-upgrades
+    echo 'Unattended-Upgrade::Remove-Unused-Dependencies "true";' >> /etc/apt/apt.conf.d/50unattended-upgrades
+    echo 'Unattended-Upgrade::Automatic-Reboot "true";' >> /etc/apt/apt.conf.d/50unattended-upgrades
+    echo 'Unattended-Upgrade::Automatic-Reboot-Time "04:00";' >> /etc/apt/apt.conf.d/50unattended-upgrades
+    echo "Автоматическое обновление настроено."
+    exit 0
+fi
+
+echo "Некорректный выбор. Запустите скрипт снова и введите 1, 2 или 3."
