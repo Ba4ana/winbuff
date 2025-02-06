@@ -26,7 +26,7 @@ if [[ "$stage" == "1" ]]; then
     apt-get update && apt-get upgrade -y
     apt update && apt dist-upgrade -y
     apt-get autoremove -y && apt-get clean -y
-    apt-get install -y sudo curl wget lnav htop mc whois gnupg2 ncdu console-cyrillic
+    apt-get install -y sudo curl socat git wget lnav htop mc whois gnupg2 ncdu console-cyrillic
 
     # История команд с временем
     echo "Настройка формата истории команд с временем..."

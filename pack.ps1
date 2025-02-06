@@ -9,10 +9,10 @@ $sourceDir = "C:\Python\pack"
 $buildDir = "$sourceDir\build"
 $distDir = "$sourceDir\dist"
 $mainDir = "C:\Users\taganashvili\YandexDisk\"
-$pythonScript = "$mainDir\I_Flash_Pack\_winbuff\_winbuff.py"
+$pythonScript = "$mainDir\I_Flash_Pack\winbuff\winbuff.py"
 $iconPath = "$mainDir\_\__\autorun.ico"
-$destinationExe = "C:\Python\pack\dist\_winbuff.exe"
-$destinationCopy = "$mainDir\I_Flash_Pack\_winbuff.exe"
+$destinationExe = "$distDir\winbuff.exe"
+$destinationCopy = "$mainDir\I_Flash_Pack\winbuff.exe"
 
 # Удаление существующих каталогов build и dist
 if (Test-Path $buildDir) { Remove-Item $buildDir -Force -Recurse }
@@ -29,6 +29,7 @@ Invoke-Expression $pyInstallerCmd
 if (Test-Path $destinationExe) {
     # Копирование файла в целевую папку
     Copy-Item $destinationExe $destinationCopy -Force
+    Copy-Item "$mainDir\I_Flash_Pack\winbuff\pack.ps1" "$mainDir\$mainDir\I_Flash_Pack\" -Force
     Write-Host "Файл успешно скомпилирован и скопирован."
 } else {
     Write-Error "Ошибка компиляции файла."
