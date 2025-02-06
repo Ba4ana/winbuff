@@ -29,7 +29,7 @@ Invoke-Expression $pyInstallerCmd
 if (Test-Path $destinationExe) {
     # Копирование файла в целевую папку
     Copy-Item $destinationExe $destinationCopy -Force
-    Copy-Item "$mainDir\I_Flash_Pack\winbuff\pack.ps1" "$mainDir\$mainDir\I_Flash_Pack\" -Force
+    Copy-Item "$mainDir\I_Flash_Pack\winbuff\_soft.ps1" "$mainDir\$mainDir\I_Flash_Pack\_soft.ps1" -Force
     Write-Host "Файл успешно скомпилирован и скопирован."
 } else {
     Write-Error "Ошибка компиляции файла."
