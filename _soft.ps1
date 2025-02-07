@@ -53,7 +53,7 @@ foreach ($dir in $directories) {
 }
 
 # Переход в каталог
-cd $main
+Set-Location $main
 
 ## Установка 7-Zip
 # Версия 7-Zip
@@ -218,6 +218,6 @@ reg add "HKEY_CURRENT_USER\Software\Classes\Applications\powershell.exe\shell\op
 reg add "HKEY_CURRENT_USER\Software\Classes\.ps1\shell\open\command" /ve /t reg_sz /d 'c:\windows\system32\windowspowershell\v1.0\powershell.exe ""%1""' /f
 
 # Переход к запуску второй части скрипта
-cd $temp
+Set-Location $temp
 .\loging.ps1
 #read-host -prompt "Для продолжения нажми Enter"

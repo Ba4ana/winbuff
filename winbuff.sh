@@ -14,9 +14,10 @@ fi
 
 # Выбор этапа выполнения
 echo "Выберите этап установки:"
-echo "1 - Первичная настрока"
-echo "2 - Zabbix"
-echo "3 - Настройка автообновления"
+echo "1 - Первичная настройка"
+echo "2 - Установка обновлений"
+echo "3 - Установка Zabbix"
+echo "4 - Настройка автообновления"
 read -p "Введите номер этапа: " stage
 
 if [[ "$stage" == "1" ]]; then
@@ -36,7 +37,6 @@ if [[ "$stage" == "1" ]]; then
     echo 'export HISTCONTROL=ignoreboth:erasedups' >> ~/.bashrc
     source ~/.bashrc
     source ~/.bash_profile
-    echo > ~/.bash_history
 
     # Увеличение скорости TCP
     echo "Настройка ускорения TCP..."
@@ -59,6 +59,14 @@ if [[ "$stage" == "1" ]]; then
 fi
 
 if [[ "$stage" == "2" ]]; then
+    echo "Установка обновлений..."
+    apt-get update && apt-get upgrade -y
+    apt update && apt dist-upgrade -y
+    apt-get autoremove  -y && apt-get clean -y
+    exit 0
+fi
+
+if [[ "$stage" == "3" ]]; then
     # Пауза перед установкой Zabbix
     echo "Перед установкой Zabbix нажмите любую клавишу для продолжения..."
     read -n 1 -s
@@ -99,7 +107,7 @@ if [[ "$stage" == "2" ]]; then
     exit 0
 fi
 
-if [[ "$stage" == "3" ]]; then
+if [[ "$stage" == "4" ]]; then
     echo "Настраиваем автоматическое обновление..."
     apt update
     apt install unattended-upgrades -y
@@ -114,4 +122,4 @@ if [[ "$stage" == "3" ]]; then
     exit 0
 fi
 
-echo "Некорректный выбор. Запустите скрипт снова и введите 1, 2 или 3."
+echo "Некорректный выбор. Запустите скрипт снова и введите 1, 2, 3 или 4."
