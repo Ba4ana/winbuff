@@ -29,7 +29,7 @@ if [[ "$stage" == "1" ]]; then
     apt-get autoremove -y && apt-get clean -y
     apt-get install -y sudo curl socat git wget lnav htop mc whois gnupg2 ncdu console-cyrillic
 
-    # История команд с временем
+    # Настройка history
     echo "Настройка формата истории команд с временем..."
     echo 'export HISTTIMEFORMAT="%d/%m/%y %T "' >> ~/.bash_profile
     echo 'export HISTSIZE=10000' >> ~/.bashrc
