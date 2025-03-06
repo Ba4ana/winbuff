@@ -5,7 +5,7 @@ $ErrorActionPreference = 'SilentlyContinue'
 $ProgressPreference = 'SilentlyContinue'
 
 # Определение переменных
-$ver = "0043"
+$ver = "0044"
 $name = "_soft"
 $main = "$env:SystemRoot\$name"
 $logs = "$main\log"

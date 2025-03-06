@@ -10,7 +10,7 @@ from pathlib import Path
 from ftplib import FTP
 
 def main():
-    ver = "0043"
+    ver = "0044"
     name = "_soft"
     main = os.path.join(os.environ['SystemRoot'], name)
     logs = os.path.join(main, "log")
