@@ -2,6 +2,7 @@ $host.UI.RawUI.ForegroundColor = "Black"
 $host.UI.RawUI.ForegroundColor = "Green"
 $host.UI.RawUI.WindowTitle = "All In"
 
+# ввод переменных
 $ver                = "0044"
 $name               = "_soft"
 $main               = "$env:SystemRoot\$name"
@@ -23,7 +24,47 @@ $drives             = 'D', 'E', 'G', 'O', 'P', 'Q', 'R', 'S', 'T', 'V'
 $inf                = "$YandexDisk\_\__\autorun.inf"
 $ico                = "$YandexDisk\_\__\autorun.ico"
 
+$user_dir           = $env:USERPROFILE
+$dir                = "$user_dir\YandexDisk\I_Flash_Pack\$name\*"
+$local_path         = "$user_dir\YandexDisk\I_Flash_Pack\$name.zip"
+$upload_url_eur     = "ftp://winbuff.evrasia.spb.ru//$name.zip"
+$user               = "ftp-upd-win"
+$pass               = "rmZxEfcWCVreuOhH_xH5Rjey0XPZrJ"
+
 Set-Location $sourceDir
+
+# Копируем Winbox
+$src = "$user_dir\AppData\Roaming\Mikrotik\Winbox"
+$dest = "$user_dir\YandexDisk\_\_Portable\KeePass\_Soft\WinBox\arh"
+if (-not (Test-Path $dest)) { New-Item -ItemType Directory -Path $dest -Force }
+Copy-Item -Path $src -Destination $dest -Recurse -Force
+
+# Подготовка архиватора
+$7zipPath = "$env:ProgramFiles\7-Zip\7z.exe"
+if (-not (Test-Path -Path $7zipPath -PathType Leaf)) {
+    Write-Host "7-Zip не установлен в указанном месте."
+    Read-Host -Prompt "Нажмите Enter для выхода"
+    exit
+}
+Set-Alias -Name 7zip -Value $7zipPath
+
+# Архивация
+7zip a -tzip -ssw -mx1 -y "$local_path" "$dir"
+
+# Загрузка на FTP
+try {
+    $webclient = New-Object System.Net.WebClient
+    $webclient.Credentials = New-Object System.Net.NetworkCredential($user, $pass)
+    Write-Host "Идёт загрузка на Evrasia $name.zip..."
+    $ftp_inf = New-Object System.Uri($upload_url_eur)
+    $webclient.UploadFile($ftp_inf, $local_path) | Out-Null
+    Write-Host "Файл успешно загружен."
+} catch {
+    Write-Host "Ошибка при загрузке: $_"
+}
+
+# Очистка
+if (Test-Path $local_path) { Remove-Item $local_path -Force }
 
 Write-Host "Смена атрибутов на дисках и копирование файлов на каждый диск"
 foreach ($drive in $drives) {
@@ -37,23 +78,23 @@ foreach ($drive in $drives) {
 ###########################################################
 #                     A B C D E F G H I K L M N O P Q R S T U V W X Y Z
 # Используемые флэшки X Y
-# Используемые диски  R S T V
+# Используемые диски  R S T U
 # SSD 3.2 20Гб M2               [R S] 462/455-Мб/с          [Paravis] [ALL]
 reg add "HKEY_LOCAL_MACHINE\SYSTEM\MountedDevices" /v "\DosDevices\R:" /t REG_BINARY /d "fd3da3220000100000000000" /f
 reg add "HKEY_LOCAL_MACHINE\SYSTEM\MountedDevices" /v "\DosDevices\S:" /t REG_BINARY /d "fd3da3220000105307000000" /f
 
 # SSD 3.0 500GB Kaseta          [T U] 147/132-Мб/с          [Paravis] [ALL]
 reg add "HKEY_LOCAL_MACHINE\SYSTEM\MountedDevices" /v "\DosDevices\T:" /t REG_BINARY /d "e93f60c70000100000000000" /f
-reg add "HKEY_LOCAL_MACHINE\SYSTEM\MountedDevices" /v "\DosDevices\V:" /t REG_BINARY /d "e93f60c70000108007000000" /f
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\MountedDevices" /v "\DosDevices\U:" /t REG_BINARY /d "e93f60c70000108007000000" /f
 
 # USB 3.1-Flash 32Гб Kingston   [W] 231/65-Мб/с             [Strelec]
-reg add "HKEY_LOCAL_MACHINE\SYSTEM\MountedDevices" /v "\DosDevices\W:" /t REG_BINARY /d "5f003f003f005f00550053004200530054004f00520023004400690073006b002600560065006e005f004b0069006e006700730074006f006e002600500072006f0064005f004400610074006100540072006100760065006c00650072005f0033002e00300026005200650076005f0050004d004100500023003400300038004400350043003100360033003200320034004500360037003000440039003400390030003500340045002600300023007b00350033006600350036003300300037002d0062003600620066002d0031003100640030002d0039003400660032002d003000300061003000630039003100650066006200380062007d00" /f
+#reg add "HKEY_LOCAL_MACHINE\SYSTEM\MountedDevices" /v "\DosDevices\W:" /t REG_BINARY /d "5f003f003f005f00550053004200530054004f00520023004400690073006b002600560065006e005f004b0069006e006700730074006f006e002600500072006f0064005f004400610074006100540072006100760065006c00650072005f0033002e00300026005200650076005f0050004d004100500023003400300038004400350043003100360033003200320034004500360037003000440039003400390030003500340045002600300023007b00350033006600350036003300300037002d0062003600620066002d0031003100640030002d0039003400660032002d003000300061003000630039003100650066006200380062007d00" /f
 
 # USB 3.0-Flash 64Гб PQI Black  [X Y] 99/67-Мб/с            [ALL]
 reg add "HKEY_LOCAL_MACHINE\SYSTEM\MountedDevices" /v "\DosDevices\X:" /t REG_BINARY /d "5f003f003f005f00550053004200530054004f00520023004400690073006b002600560065006e005f0055005300420033002e0030002600500072006f0064005f0046004c004100530048005f004400520049005600450026005200650076005f00310031003000300023004100410038005a0039004a0038004c0059003200560041003600300045004d002600300023007b00350033006600350036003300300037002d0062003600620066002d0031003100640030002d0039003400660032002d003000300061003000630039003100650066006200380062007d00" /f
 reg add "HKEY_LOCAL_MACHINE\SYSTEM\MountedDevices" /v "\DosDevices\Y:" /t REG_BINARY /d "7b00320039003300610037003200310039002d0031003600310063002d0031003100660030002d0061003400620031002d003000340064003400630034006600300033003000640033007d0023003000300030003000300030003000330045003800310030003000300030003000" /f
 
-# USB 3.1-Flash 32Гб Transcend  [X] 138/53-Мб/с
+# USB 3.1-Flash 32Гб Transcend  [Z] 138/53-Мб/с
 # USB 3.1-Flash 32Гб SanDisk    [ ] 160/26-Мб/с
 # USB 3.0-Flash 64Гб X White
 # USB 2.0-Flash 16Гб Скелетон
@@ -70,8 +111,8 @@ Add-MpPreference -ExclusionPath "T:\" -force
 Add-MpPreference -ExclusionPath "U:\" -force
 Add-MpPreference -ExclusionPath "X:\" -force
 Add-MpPreference -ExclusionPath "Y:\" -force
-Add-MpPreference -ExclusionPath "W:\" -force
-Copy-Item "$YandexDisk\_\__\_spy.bat" W:\ -Force -ErrorAction Ignore
+Add-MpPreference -ExclusionPath "Z:\" -force
+Copy-Item "$YandexDisk\_\__\_spy.bat" "Z:\" -Force -ErrorAction Ignore
 
 $Host.UI.RawUI.WindowTitle = "copy I_Flash_Pack"
 RoboCopy "$YandexDisk\I_Flash_Pack" "D:\_DckWB\I_Flash_Pack" /MIR /Z /XO /R:0 /W:0
