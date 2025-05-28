@@ -47,12 +47,14 @@ while true; do
         echo "Настраиваем sudo для пользователя tech без пароля..."
         echo "tech    ALL=(ALL)    NOPASSWD:ALL" >> /etc/sudoers
         echo "Этап 1 завершен!"
+
     elif [[ "$stage" == "2" ]]; then
         echo "Установка обновлений..."
         apt-get update && apt-get upgrade -y
         apt update && apt dist-upgrade -y
         apt-get autoremove  -y && apt-get clean -y
         echo "Этап 2 завершен!"
+
     elif [[ "$stage" == "3" ]]; then
         echo "Перед установкой Zabbix нажмите любую клавишу для продолжения..."
         read -n 1 -s
@@ -61,11 +63,11 @@ while true; do
         ZABBIX_SERVER="192.168.103.251"
         HOSTNAME=$(hostname)
         echo "Добавляем репозиторий Zabbix $ZABBIX_VERSION для Debian $DEBIAN_VERSION"
-        wget -q https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/zabbix-release_latest+debian12_all.deb || { echo "Ошибка при загрузке репозитория Zabbix"; continue; }
-        dpkg -i zabbix-release_latest+debian12_all.deb || { echo "Ошибка при установке репозитория Zabbix"; continue; }
+        wget -q https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/zabbix-release_latest_7.0+debian12_all.deb|| { echo "Ошибка при загрузке репозитория Zabbix"; continue; }
+        dpkg -i zabbix-release_latest_7.0+debian12_all.deb || { echo "Ошибка при установке репозитория Zabbix"; continue; }
         apt update || { echo "Ошибка при обновлении списка пакетов"; continue; }
         echo "Устанавливаем Zabbix агент"
-        apt install -y zabbix-agent2 || { echo "Ошибка при установке Zabbix агента"; continue; }
+        apt install -y zabbix-agent || { echo "Ошибка при установке Zabbix агента"; continue; }
         echo "Настраиваем Zabbix агент"
         sed -i "s/^Server=127.0.0.1/Server=${ZABBIX_SERVER}/" /etc/zabbix/zabbix_agentd.conf
         sed -i "s/^ServerActive=127.0.0.1/ServerActive=${ZABBIX_SERVER}/" /etc/zabbix/zabbix_agentd.conf
@@ -75,6 +77,8 @@ while true; do
         systemctl enable zabbix-agent || { echo "Ошибка при включении Zabbix агента"; continue; }
         systemctl status zabbix-agent || { echo "Ошибка при проверке статуса Zabbix агента"; continue; }
         echo "Zabbix агент установлен и настроен!"
+        read -n 1 -s
+
     elif [[ "$stage" == "4" ]]; then
         echo "Настраиваем автоматическое обновление..."
         apt update
@@ -87,6 +91,7 @@ while true; do
         echo 'Unattended-Upgrade::Automatic-Reboot "true";' >> /etc/apt/apt.conf.d/50unattended-upgrades
         echo 'Unattended-Upgrade::Automatic-Reboot-Time "04:00";' >> /etc/apt/apt.conf.d/50unattended-upgrades
         echo "Автоматическое обновление настроено."
+
     elif [[ "$stage" == "0" ]]; then
         echo "Выход из скрипта."
         exit 0
