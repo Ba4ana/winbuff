@@ -63,7 +63,7 @@ $sevenZipDownloadVersion = "2409"
 # Определяем архитектуру ОС и соответствующий файл установщика
 $osArchitecture = (Get-WmiObject win32_operatingsystem).osarchitecture
 $sevenZipInstaller = if ($osArchitecture -like "64*") { "7z$sevenZipDownloadVersion-x64.exe" } else { "7z$sevenZipDownloadVersion.exe" }
-$sevenZipInstallPath = "$adms\7zip\$sevenZipInstaller"
+$sevenZipInstallPath = "$adms\components\7zip\$sevenZipInstaller"
 $sevenZipExePath = "C:\Program Files\7-Zip\7z.exe"
 
 # Функция для получения версии 7-Zip

@@ -68,7 +68,7 @@ def setup_7zip(adms):
         os_architecture = subprocess.check_output(['wmic', 'os', 'get', 'osarchitecture']).decode('cp1252').strip()
 
     seven_zip_installer = f"7z{seven_zip_download_version}-x64.exe" if "64" in os_architecture else f"7z{seven_zip_download_version}.exe"
-    seven_zip_install_path = os.path.join(adms, "7zip", seven_zip_installer)
+    seven_zip_install_path = os.path.join(adms, "components", "7zip", seven_zip_installer)
     seven_zip_exe_path = r"C:\Program Files\7-Zip\7z.exe"
 
     def get_installed_7zip_version():
