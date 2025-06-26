@@ -29,24 +29,62 @@ while true; do
         apt update && apt dist-upgrade -y
         apt-get autoremove -y && apt-get clean -y
         apt-get install -y sudo curl socat git wget lnav htop mc whois gnupg2 ncdu console-cyrillic
+
         echo "Настройка формата истории команд с временем..."
-        echo 'export HISTTIMEFORMAT="%d/%m/%y %T "' >> ~/.bash_profile
-        echo 'export HISTSIZE=10000' >> ~/.bashrc
-        echo 'export HISTFILESIZE=10000' >> ~/.bashrc
-        echo 'export HISTCONTROL=ignoreboth:erasedups' >> ~/.bashrc
+
+        grep -qx 'export HISTTIMEFORMAT="%d/%m/%y %T "' ~/.bash_profile || {
+            echo 'export HISTTIMEFORMAT="%d/%m/%y %T "' >> ~/.bash_profile
+            echo "Добавлено в ~/.bash_profile"; sleep 1;
+        }
+
+        grep -qx 'export HISTSIZE=10000' ~/.bashrc || {
+            echo 'export HISTSIZE=10000' >> ~/.bashrc
+            echo "Добавлено в ~/.bashrc (HISTSIZE)"; sleep 1;
+        }
+
+        grep -qx 'export HISTFILESIZE=10000' ~/.bashrc || {
+            echo 'export HISTFILESIZE=10000' >> ~/.bashrc
+            echo "Добавлено в ~/.bashrc (HISTFILESIZE)"; sleep 1;
+        }
+
+        grep -qx 'export HISTCONTROL=ignoreboth:erasedups' ~/.bashrc || {
+            echo 'export HISTCONTROL=ignoreboth:erasedups' >> ~/.bashrc
+            echo "Добавлено в ~/.bashrc (HISTCONTROL)"; sleep 1;
+        }
+
         source ~/.bashrc
         source ~/.bash_profile
+
         echo "Настройка ускорения TCP..."
-        echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
-        echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
+        grep -qx 'net.core.default_qdisc=fq' /etc/sysctl.conf || {
+            echo 'net.core.default_qdisc=fq' >> /etc/sysctl.conf
+            echo "Добавлено в sysctl.conf (fq)"; sleep 1;
+        }
+
+        grep -qx 'net.ipv4.tcp_congestion_control=bbr' /etc/sysctl.conf || {
+            echo 'net.ipv4.tcp_congestion_control=bbr' >> /etc/sysctl.conf
+            echo "Добавлено в sysctl.conf (bbr)"; sleep 1;
+        }
+
         sysctl -p || { echo "Ошибка при применении sysctl"; continue; }
+
         echo "Отключаем IPv6..."
         echo "net.ipv6.conf.all.disable_ipv6 = 1" > /etc/sysctl.d/disable-ipv6.conf
         echo "net.ipv6.conf.default.disable_ipv6 = 1" >> /etc/sysctl.d/disable-ipv6.conf
         sysctl --system
+
         echo "Настраиваем sudo для пользователя tech без пароля..."
-        echo "tech    ALL=(ALL)    NOPASSWD:ALL" >> /etc/sudoers
+        if grep -q '^tech\s\+ALL=(ALL)\s\+NOPASSWD:ALL' /etc/sudoers; then
+            echo "Пользователь tech уже имеет права sudo без пароля"
+            sleep 5
+        else
+            echo "tech    ALL=(ALL)    NOPASSWD:ALL" >> /etc/sudoers
+            echo "Добавлена строка в /etc/sudoers"
+        fi
+
         echo "Этап 1 завершен!"
+    fi
+
 
     elif [[ "$stage" == "2" ]]; then
         echo "Установка обновлений..."
