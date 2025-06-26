@@ -31,41 +31,16 @@ while true; do
         apt-get install -y sudo curl socat git wget lnav htop mc whois gnupg2 ncdu console-cyrillic
 
         echo "Настройка формата истории команд с временем..."
-
-        grep -qx 'export HISTTIMEFORMAT="%d/%m/%y %T "' ~/.bash_profile || {
-            echo 'export HISTTIMEFORMAT="%d/%m/%y %T "' >> ~/.bash_profile
-            echo "Добавлено в ~/.bash_profile"; sleep 1;
-        }
-
-        grep -qx 'export HISTSIZE=10000' ~/.bashrc || {
-            echo 'export HISTSIZE=10000' >> ~/.bashrc
-            echo "Добавлено в ~/.bashrc (HISTSIZE)"; sleep 1;
-        }
-
-        grep -qx 'export HISTFILESIZE=10000' ~/.bashrc || {
-            echo 'export HISTFILESIZE=10000' >> ~/.bashrc
-            echo "Добавлено в ~/.bashrc (HISTFILESIZE)"; sleep 1;
-        }
-
-        grep -qx 'export HISTCONTROL=ignoreboth:erasedups' ~/.bashrc || {
-            echo 'export HISTCONTROL=ignoreboth:erasedups' >> ~/.bashrc
-            echo "Добавлено в ~/.bashrc (HISTCONTROL)"; sleep 1;
-        }
-
+        grep -qx 'export HISTTIMEFORMAT="%d/%m/%y %T "' ~/.bash_profile || echo 'export HISTTIMEFORMAT="%d/%m/%y %T "' >> ~/.bash_profile
+        grep -qx 'export HISTSIZE=10000' ~/.bashrc || echo 'export HISTSIZE=10000' >> ~/.bashrc
+        grep -qx 'export HISTFILESIZE=10000' ~/.bashrc || echo 'export HISTFILESIZE=10000' >> ~/.bashrc
+        grep -qx 'export HISTCONTROL=ignoreboth:erasedups' ~/.bashrc || echo 'export HISTCONTROL=ignoreboth:erasedups' >> ~/.bashrc
         source ~/.bashrc
         source ~/.bash_profile
 
         echo "Настройка ускорения TCP..."
-        grep -qx 'net.core.default_qdisc=fq' /etc/sysctl.conf || {
-            echo 'net.core.default_qdisc=fq' >> /etc/sysctl.conf
-            echo "Добавлено в sysctl.conf (fq)"; sleep 1;
-        }
-
-        grep -qx 'net.ipv4.tcp_congestion_control=bbr' /etc/sysctl.conf || {
-            echo 'net.ipv4.tcp_congestion_control=bbr' >> /etc/sysctl.conf
-            echo "Добавлено в sysctl.conf (bbr)"; sleep 1;
-        }
-
+        grep -qx 'net.core.default_qdisc=fq' /etc/sysctl.conf || echo 'net.core.default_qdisc=fq' >> /etc/sysctl.conf
+        grep -qx 'net.ipv4.tcp_congestion_control=bbr' /etc/sysctl.conf || echo 'net.ipv4.tcp_congestion_control=bbr' >> /etc/sysctl.conf
         sysctl -p || { echo "Ошибка при применении sysctl"; continue; }
 
         echo "Отключаем IPv6..."
@@ -83,8 +58,6 @@ while true; do
         fi
 
         echo "Этап 1 завершен!"
-    fi
-
 
     elif [[ "$stage" == "2" ]]; then
         echo "Установка обновлений..."
@@ -101,7 +74,7 @@ while true; do
         ZABBIX_SERVER="192.168.103.251"
         HOSTNAME=$(hostname)
         echo "Добавляем репозиторий Zabbix $ZABBIX_VERSION для Debian $DEBIAN_VERSION"
-        wget -q https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/zabbix-release_latest_7.0+debian12_all.deb|| { echo "Ошибка при загрузке репозитория Zabbix"; continue; }
+        wget -q https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/zabbix-release_latest_7.0+debian12_all.deb || { echo "Ошибка при загрузке репозитория Zabbix"; continue; }
         dpkg -i zabbix-release_latest_7.0+debian12_all.deb || { echo "Ошибка при установке репозитория Zabbix"; continue; }
         apt update || { echo "Ошибка при обновлении списка пакетов"; continue; }
         echo "Устанавливаем Zabbix агент"
@@ -145,12 +118,11 @@ while true; do
         done
 
         echo "Автоматическое обновление настроено."
-    fi
-
 
     elif [[ "$stage" == "0" ]]; then
         echo "Выход из скрипта."
         exit 0
+
     else
         echo "Некорректный выбор. Введите 1, 2, 3, 4 или 0 для выхода."
     fi
