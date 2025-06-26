@@ -86,11 +86,29 @@ while true; do
         dpkg-reconfigure -f noninteractive unattended-upgrades
         echo 'APT::Periodic::Update-Package-Lists "1";' > /etc/apt/apt.conf.d/20auto-upgrades
         echo 'APT::Periodic::Unattended-Upgrade "1";' >> /etc/apt/apt.conf.d/20auto-upgrades
-        echo 'Unattended-Upgrade::Remove-Unused-kernel-Packages "true";' >> /etc/apt/apt.conf.d/50unattended-upgrades
-        echo 'Unattended-Upgrade::Remove-Unused-Dependencies "true";' >> /etc/apt/apt.conf.d/50unattended-upgrades
-        echo 'Unattended-Upgrade::Automatic-Reboot "true";' >> /etc/apt/apt.conf.d/50unattended-upgrades
-        echo 'Unattended-Upgrade::Automatic-Reboot-Time "04:00";' >> /etc/apt/apt.conf.d/50unattended-upgrades
+
+        UPG_FILE="/etc/apt/apt.conf.d/50unattended-upgrades"
+
+        declare -A settings
+        settings["Unattended-Upgrade::Remove-Unused-kernel-Packages"]="true"
+        settings["Unattended-Upgrade::Remove-Unused-Dependencies"]="true"
+        settings["Unattended-Upgrade::Automatic-Reboot"]="true"
+        settings["Unattended-Upgrade::Automatic-Reboot-Time"]="\"04:00\""
+
+        for key in "${!settings[@]}"; do
+            value="${settings[$key]}"
+            if grep -q "$key \"$value\";" "$UPG_FILE"; then
+                echo "Уже настроено: $key $value"
+                sleep 5
+            else
+                echo "$key \"$value\";" >> "$UPG_FILE"
+                echo "Добавлено: $key $value"
+            fi
+        done
+
         echo "Автоматическое обновление настроено."
+    fi
+
 
     elif [[ "$stage" == "0" ]]; then
         echo "Выход из скрипта."
