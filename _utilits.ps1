@@ -63,7 +63,7 @@ $sevenZipDownloadVersion = "2409"
 # Определяем архитектуру ОС и соответствующий файл установщика
 $osArchitecture = (Get-WmiObject win32_operatingsystem).osarchitecture
 $sevenZipInstaller = if ($osArchitecture -like "64*") { "7z$sevenZipDownloadVersion-x64.exe" } else { "7z$sevenZipDownloadVersion.exe" }
-$sevenZipInstallPath = "$adms\components\7zip\$sevenZipInstaller"
+$sevenZipInstallPath = "$adms\7zip\$sevenZipInstaller"
 $sevenZipExePath = "C:\Program Files\7-Zip\7z.exe"
 
 # Функция для получения версии 7-Zip
@@ -161,9 +161,11 @@ $down_url = "ftp://winbuff.evrasia.spb.ru//$name.zip"
 $local_path = "$temp\$name.zip"
 $user = "u1206988_upd_win"
 $pass = "0912832130Ws@"
-$webclient = new-object system.net.webclient
-$webclient.credentials = new-object system.net.networkcredential($user, $pass)
-$webclient.downloadfile($down_url, $local_path)
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$webclient = New-Object System.Net.WebClient
+$webclient.Credentials = New-Object System.Net.NetworkCredential($user, $pass)
+$webclient.DownloadFile($down_url, $local_path)
+
 
 # Распаковка архива
 expand-archive -path $local_path -destinationpath $temp -force
