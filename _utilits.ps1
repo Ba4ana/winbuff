@@ -73,8 +73,6 @@ function Get-7ZipVersion {
         if ($output) {
             $version = ($output -replace "7-Zip ", "").Split(" ")[0]
             return $version.Trim()
-        } else {
-            return $null
         }
     }
     return $null
@@ -99,11 +97,9 @@ if (Test-Path $sevenZipExePath) {
         Write-Host "Не удалось определить версию установленного 7-Zip." -ForegroundColor Yellow
     }
 
-    # Если версия совпадает с той, что хотите установить, пропускаем установку
     if ($installedVersion -eq $sevenZipDisplayVersion) {
         Write-Host "7-Zip версии $sevenZipDisplayVersion уже установлен. Пропускаем установку." -ForegroundColor Green
     } else {
-        # Проверка наличия интернета и скачивание установщика
         if (Test-InternetConnection) {
             if (!(Test-Path $sevenZipInstallPath)) {
                 Write-Host "Загрузка 7-Zip версии $sevenZipDisplayVersion..."
@@ -111,25 +107,25 @@ if (Test-Path $sevenZipExePath) {
                 $client = New-Object System.Net.WebClient
                 $downloadLink = "https://www.7-zip.org/a/$sevenZipInstaller"
 
-                # Попытка скачивания
                 try {
                     $client.DownloadFile($downloadLink, $sevenZipInstallPath)
                     Write-Host "Файл $sevenZipInstaller успешно скачан."
                 } catch {
                     Write-Host "Ошибка при скачивании файла $sevenZipInstaller" -ForegroundColor Red
-                    exit
                 }
             }
 
-            # Установка 7-Zip
-            Write-Host "Установка 7-Zip версии $sevenZipDisplayVersion..."
-            Start-Process -FilePath $sevenZipInstallPath -ArgumentList "/S" -Wait
+            if (Test-Path $sevenZipInstallPath) {
+                Write-Host "Установка 7-Zip версии $sevenZipDisplayVersion..."
+                Start-Process -FilePath $sevenZipInstallPath -ArgumentList "/S" -Wait
+            } else {
+                Write-Host "Файл установщика не найден. Установка пропущена." -ForegroundColor Yellow
+            }
         } else {
             Write-Host "Интернет-соединение отсутствует. Пропускаем скачивание 7-Zip." -ForegroundColor Yellow
         }
     }
 } else {
-    # Если 7-Zip не установлен, проверяем интернет для скачивания
     Write-Host "7-Zip не установлен. Начинаем установку."
     if (Test-InternetConnection) {
         if (!(Test-Path $sevenZipInstallPath)) {
@@ -138,19 +134,20 @@ if (Test-Path $sevenZipExePath) {
             $client = New-Object System.Net.WebClient
             $downloadLink = "https://www.7-zip.org/a/$sevenZipInstaller"
 
-            # Попытка скачивания
             try {
                 $client.DownloadFile($downloadLink, $sevenZipInstallPath)
                 Write-Host "Файл $sevenZipInstaller успешно скачан."
             } catch {
                 Write-Host "Ошибка при скачивании файла $sevenZipInstaller" -ForegroundColor Red
-                exit
             }
         }
 
-        # Установка 7-Zip
-        Write-Host "Установка 7-Zip версии $sevenZipDisplayVersion..."
-        Start-Process -FilePath $sevenZipInstallPath -ArgumentList "/S" -Wait
+        if (Test-Path $sevenZipInstallPath) {
+            Write-Host "Установка 7-Zip версии $sevenZipDisplayVersion..."
+            Start-Process -FilePath $sevenZipInstallPath -ArgumentList "/S" -Wait
+        } else {
+            Write-Host "Файл установщика не найден. Установка пропущена." -ForegroundColor Yellow
+        }
     } else {
         Write-Host "Интернет-соединение отсутствует. Пропускаем установку 7-Zip." -ForegroundColor Yellow
     }
