@@ -22,6 +22,9 @@ while true; do
     echo "0 - Выход"
     read -p "Введите номер этапа: " stage
 
+######################
+#          I         #
+######################
     if [[ "$stage" == "1" ]]; then
         echo "Устанавливаем необходимые пакеты..."
         sed -i '/^deb cdrom:/d' /etc/apt/sources.list
@@ -30,26 +33,32 @@ while true; do
         apt-get autoremove -y && apt-get clean -y
         apt-get install -y sudo curl socat git wget lnav htop mc whois gnupg2 ncdu console-cyrillic
 
-        echo "Настройка формата истории команд с временем..."
-        grep -qx 'export HISTTIMEFORMAT="%d/%m/%y %T "' ~/.bash_profile || {
-            echo 'export HISTTIMEFORMAT="%d/%m/%y %T "' >> ~/.bash_profile
-            echo "Добавлено в ~/.bash_profile"; sleep 1;
-        }
+        echo "Настройка формата истории команд и окружения..."
 
-        grep -qx 'export HISTSIZE=10000' ~/.bashrc || {
-            echo 'export HISTSIZE=10000' >> ~/.bashrc
-            echo "Добавлено в ~/.bashrc (HISTSIZE)"; sleep 1;
-        }
+        sed -i '/^export HISTSIZE=/d' ~/.bashrc
+        sed -i '/^export HISTFILESIZE=/d' ~/.bashrc
+        sed -i '/^export HISTCONTROL=/d' ~/.bashrc
 
-        grep -qx 'export HISTFILESIZE=10000' ~/.bashrc || {
-            echo 'export HISTFILESIZE=10000' >> ~/.bashrc
-            echo "Добавлено в ~/.bashrc (HISTFILESIZE)"; sleep 1;
-        }
+        grep -qx 'export HISTTIMEFORMAT="%d/%m/%y %T "' ~/.bash_profile || echo 'export HISTTIMEFORMAT="%d/%m/%y %T "' >> ~/.bash_profile
+        grep -qx 'export HISTSIZE=1999' ~/.bash_profile || echo 'export HISTSIZE=1999' >> ~/.bash_profile
+        grep -qx 'export HISTFILESIZE=1999' ~/.bash_profile || echo 'export HISTFILESIZE=1999' >> ~/.bash_profile
+        grep -qx 'export HISTCONTROL=ignoreboth:erasedups' ~/.bash_profile || echo 'export HISTCONTROL=ignoreboth:erasedups' >> ~/.bash_profile
+        grep -qx "export HISTIGNORE='shutdown:reboot:history*:ls:ps:mc:htop:apt*'" ~/.bash_profile || echo "export HISTIGNORE='shutdown:reboot:history*:ls:ps:mc:htop:apt*'" >> ~/.bash_profile
+        grep -qx "PROMPT_COMMAND='history -a'" ~/.bash_profile || echo "PROMPT_COMMAND='history -a'" >> ~/.bash_profile
 
-        grep -qx 'export HISTCONTROL=ignoreboth:erasedups' ~/.bashrc || {
-            echo 'export HISTCONTROL=ignoreboth:erasedups' >> ~/.bashrc
-            echo "Добавлено в ~/.bashrc (HISTCONTROL)"; sleep 1;
-        }
+        if [ -d /home/tech ]; then
+            sed -i '/^export HISTSIZE=/d' /home/tech/.bashrc 2>/dev/null
+            sed -i '/^export HISTFILESIZE=/d' /home/tech/.bashrc 2>/dev/null
+            sed -i '/^export HISTCONTROL=/d' /home/tech/.bashrc 2>/dev/null
+
+            grep -qx 'export HISTTIMEFORMAT="%d/%m/%y %T "' /home/tech/.bash_profile || echo 'export HISTTIMEFORMAT="%d/%m/%y %T "' >> /home/tech/.bash_profile
+            grep -qx 'export HISTSIZE=1999' /home/tech/.bash_profile || echo 'export HISTSIZE=1999' >> /home/tech/.bash_profile
+            grep -qx 'export HISTFILESIZE=1999' /home/tech/.bash_profile || echo 'export HISTFILESIZE=1999' >> /home/tech/.bash_profile
+            grep -qx 'export HISTCONTROL=ignoreboth:erasedups' /home/tech/.bash_profile || echo 'export HISTCONTROL=ignoreboth:erasedups' >> /home/tech/.bash_profile
+            grep -qx "export HISTIGNORE='shutdown:reboot:history*:ls:ps:mc:htop:apt*'" /home/tech/.bash_profile || echo "export HISTIGNORE='shutdown:reboot:history*:ls:ps:mc:htop:apt*'" >> /home/tech/.bash_profile
+            grep -qx "PROMPT_COMMAND='history -a'" /home/tech/.bash_profile || echo "PROMPT_COMMAND='history -a'" >> /home/tech/.bash_profile
+            chown tech:tech /home/tech/.bash_profile
+        fi
 
         source ~/.bashrc
         source ~/.bash_profile
@@ -82,6 +91,9 @@ while true; do
         fi
         echo "Этап 1 завершен!"
 
+######################
+#         II         #
+######################
     elif [[ "$stage" == "2" ]]; then
         echo "Установка обновлений..."
         apt-get update && apt-get upgrade -y
@@ -89,6 +101,9 @@ while true; do
         apt-get autoremove  -y && apt-get clean -y
         echo "Этап 2 завершен!"
 
+######################
+#         III        #
+######################
     elif [[ "$stage" == "3" ]]; then
         echo "Настраиваем автоматическое обновление..."
         apt update
@@ -117,6 +132,9 @@ while true; do
         done
         echo "Автоматическое обновление настроено."
 
+######################
+#         IV         #
+######################
     elif [[ "$stage" == "4" ]]; then
         echo "Перед установкой Zabbix нажмите любую клавишу для продолжения..."
         read -n 1 -s
@@ -141,10 +159,16 @@ while true; do
         echo "Zabbix агент установлен и настроен!"
         read -n 1 -s
 
+######################
+#          N         #
+######################
     elif [[ "$stage" == "0" ]]; then
         echo "Выход из скрипта."
         exit 0
 
+######################
+#        E N D       #
+######################
     else
         echo "Некорректный выбор. Введите 1, 2, 3, 4 или 0 для выхода."
     fi
