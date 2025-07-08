@@ -19,6 +19,7 @@ while true; do
     echo "2 - Установка обновлений"
     echo "3 - Настройка автообновления"
     echo "4 - Установка Zabbix"
+    echo "5 - Настройка интерфейса eth0"
     echo "0 - Выход"
     read -p "Введите номер этапа: " stage
 
@@ -164,6 +165,37 @@ while true; do
         systemctl status zabbix-agent || { echo "Ошибка при проверке статуса Zabbix агента"; continue; }
         echo "Zabbix агент установлен и настроен!"
         read -n 1 -s
+
+######################
+#          V         #
+######################
+    elif [[ "$stage" == "5" ]]; then
+        echo "Настройка наименования сетевого интерфейса как eth0..."
+
+        if grep -q 'net.ifnames=0' /etc/default/grub; then
+            echo "Параметр net.ifnames=0 уже установлен в GRUB"
+        else
+            sed -i '/^GRUB_CMDLINE_LINUX=/ s/"$/ net.ifnames=0"/' /etc/default/grub
+            echo "Добавлен параметр net.ifnames=0 в GRUB"
+            grub-mkconfig -o /boot/grub/grub.cfg || { echo "Ошибка при обновлении конфигурации GRUB"; continue; }
+        fi
+
+        if grep -q '^iface eth0 inet dhcp' /etc/network/interfaces; then
+            echo "Интерфейс eth0 уже настроен"
+        else
+            cat << EOF >> /etc/network/interfaces
+
+# The primary network interface
+allow-hotplug eth0
+iface eth0 inet dhcp
+EOF
+            echo "Добавлена настройка интерфейса eth0 в /etc/network/interfaces"
+        fi
+
+        systemctl restart networking || { echo "Ошибка при перезапуске networking"; continue; }
+
+        echo "Настройка интерфейса eth0 завершена. Требуется перезагрузка системы для применения изменений."
+        read -n 1 -s -p "Нажмите любую клавишу для продолжения..."
 
 ######################
 #          N         #
