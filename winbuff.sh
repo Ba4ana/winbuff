@@ -35,6 +35,9 @@ while true; do
 
         echo "Настройка формата истории команд и окружения..."
 
+        [ -f ~/.bash_profile ] || touch ~/.bash_profile
+        [ -f ~/.bashrc ] || touch ~/.bashrc
+
         sed -i '/^export HISTSIZE=/d' ~/.bashrc
         sed -i '/^export HISTFILESIZE=/d' ~/.bashrc
         sed -i '/^export HISTCONTROL=/d' ~/.bashrc
@@ -47,6 +50,9 @@ while true; do
         grep -qx "PROMPT_COMMAND='history -a'" ~/.bash_profile || echo "PROMPT_COMMAND='history -a'" >> ~/.bash_profile
 
         if [ -d /home/tech ]; then
+            [ -f /home/tech/.bash_profile ] || touch /home/tech/.bash_profile
+            [ -f /home/tech/.bashrc ] || touch /home/tech/.bashrc
+
             sed -i '/^export HISTSIZE=/d' /home/tech/.bashrc 2>/dev/null
             sed -i '/^export HISTFILESIZE=/d' /home/tech/.bashrc 2>/dev/null
             sed -i '/^export HISTCONTROL=/d' /home/tech/.bashrc 2>/dev/null
