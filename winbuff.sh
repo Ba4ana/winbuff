@@ -29,8 +29,7 @@ while true; do
     if [[ "$stage" == "1" ]]; then
         echo "Устанавливаем необходимые пакеты..."
         sed -i '/^deb cdrom:/d' /etc/apt/sources.list
-        apt-get update && apt-get upgrade -y
-        apt update && apt dist-upgrade -y
+        apt-get update && apt update 
         apt-get autoremove -y && apt-get clean -y
         apt-get install -y sudo curl socat git wget lnav htop mc whois gnupg2 ncdu console-cyrillic
 
