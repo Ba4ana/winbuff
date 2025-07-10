@@ -46,7 +46,7 @@ while true; do
         grep -qx 'export HISTSIZE=1999' ~/.bash_profile || echo 'export HISTSIZE=1999' >> ~/.bash_profile
         grep -qx 'export HISTFILESIZE=1999' ~/.bash_profile || echo 'export HISTFILESIZE=1999' >> ~/.bash_profile
         grep -qx 'export HISTCONTROL=ignoreboth:erasedups' ~/.bash_profile || echo 'export HISTCONTROL=ignoreboth:erasedups' >> ~/.bash_profile
-        grep -Fxq "export HISTIGNORE='shutdown:reboot:history*:ls:ps:mc:htop:apt*'" ~/.bash_profile || echo "export HISTIGNORE='shutdown:reboot:history*:ls:ps:mc:htop:apt*'" >> ~/.bash_profile
+        grep -Fxq "export HISTIGNORE='shutdown:reboot:history*:exit:ls:mc:htop:apt*'" ~/.bash_profile || echo "export HISTIGNORE='shutdown:reboot:history*:exit:ls:mc:htop:apt*'" >> ~/.bash_profile
         grep -qx "PROMPT_COMMAND='history -a'" ~/.bash_profile || echo "PROMPT_COMMAND='history -a'" >> ~/.bash_profile
 
         if [ -d /home/tech ]; then
@@ -61,7 +61,7 @@ while true; do
             grep -qx 'export HISTSIZE=1999' /home/tech/.bash_profile || echo 'export HISTSIZE=1999' >> /home/tech/.bash_profile
             grep -qx 'export HISTFILESIZE=1999' /home/tech/.bash_profile || echo 'export HISTFILESIZE=1999' >> /home/tech/.bash_profile
             grep -qx 'export HISTCONTROL=ignoreboth:erasedups' /home/tech/.bash_profile || echo 'export HISTCONTROL=ignoreboth:erasedups' >> /home/tech/.bash_profile
-            grep -Fxq "export HISTIGNORE='shutdown:reboot:history*:ls:ps:mc:htop:apt*'" /home/tech/.bash_profile || echo "export HISTIGNORE='shutdown:reboot:history*:ls:ps:mc:htop:apt*'" >> /home/tech/.bash_profile
+            grep -Fxq "export HISTIGNORE='shutdown:reboot:history*:exit:ls:mc:htop:apt*'" /home/tech/.bash_profile || echo "export HISTIGNORE='shutdown:reboot:history*:exit:ls:mc:htop:apt*'" >> /home/tech/.bash_profile
             grep -qx "PROMPT_COMMAND='history -a'" /home/tech/.bash_profile || echo "PROMPT_COMMAND='history -a'" >> /home/tech/.bash_profile
             chown tech:tech /home/tech/.bash_profile
         fi
