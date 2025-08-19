@@ -69,19 +69,6 @@ while true; do
         source ~/.bashrc
         source ~/.bash_profile
 
-        echo "Настройка ускорения TCP..."
-        grep -qx 'net.core.default_qdisc=fq' /etc/sysctl.conf || {
-            echo 'net.core.default_qdisc=fq' >> /etc/sysctl.conf
-            echo "Добавлено в sysctl.conf (fq)"; sleep 1;
-        }
-
-        grep -qx 'net.ipv4.tcp_congestion_control=bbr' /etc/sysctl.conf || {
-            echo 'net.ipv4.tcp_congestion_control=bbr' >> /etc/sysctl.conf
-            echo "Добавлено в sysctl.conf (bbr)"; sleep 1;
-        }
-
-        sysctl -p || { echo "Ошибка при применении sysctl"; continue; }
-
         echo "Отключаем IPv6..."
         echo "net.ipv6.conf.all.disable_ipv6 = 1" > /etc/sysctl.d/disable-ipv6.conf
         echo "net.ipv6.conf.default.disable_ipv6 = 1" >> /etc/sysctl.d/disable-ipv6.conf
@@ -207,6 +194,6 @@ EOF
 #        E N D       #
 ######################
     else
-        echo "Некорректный выбор. Введите 1, 2, 3, 4 или 0 для выхода."
+        echo "Некорректный выбор. Введите цыфру или 0 для выхода."
     fi
 done
