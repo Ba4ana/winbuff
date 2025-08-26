@@ -5,8 +5,8 @@ $ErrorActionPreference = 'SilentlyContinue'
 $ProgressPreference = 'SilentlyContinue'
 
 # Определение переменных
-$ver = "0050"
-$name = "_utilits"
+$ver = "0051"
+$name = "_winbuff"
 $main = "$env:SystemRoot\$name"
 $logs = "$main\log"
 $temp = "$main\temp"
