@@ -9,6 +9,26 @@ import logging
 import platform
 from pathlib import Path
 from ftplib import FTP
+import socket
+import time
+
+def has_internet(timeout=3):
+    """Простейшая проверка интернет-соединения: пробуем установить TCP-соединение с публичным DNS."""
+    try:
+        socket.create_connection(("8.8.8.8", 53), timeout=timeout)
+        return True
+    except Exception:
+        return False
+
+
+def warn_and_pause(msg, seconds=10):
+    if msg:
+        print(msg)
+    try:
+        time.sleep(seconds)
+    except KeyboardInterrupt:
+        pass
+
 
 def main():
     ver = "0052"
@@ -20,19 +40,27 @@ def main():
     for path in [main, logs, temp, adms]:
         Path(path).mkdir(parents=True, exist_ok=True)
 
-    try:
-        setup_console()
-        print_info(ver, name)
-        setup_directories([main, logs, temp, adms])
-        setup_7zip(adms)
-        download_and_extract(name, temp)
-        copy_files(temp, main, adms, name)
-        setup_autostart(name, temp)
-        update_registry()
-        update_execution_policy()
-        run_next_script(temp, name)
-    except Exception as e:
-        print(f"Произошла ошибка: {e}")
+    steps = [
+        (setup_console, ()),
+        (print_info, (ver, name)),
+        (setup_7zip, (adms,)),
+        (download_and_extract, (name, temp)),
+        (copy_files, (temp, main, adms, name)),
+        (setup_autostart, (name, temp)),
+        (update_registry, ()),
+        (update_execution_policy, ()),
+        (run_next_script, (temp, name)),
+    ]
+
+    for func, args in steps:
+        try:
+            func(*args)
+        except KeyboardInterrupt:
+            print("Прервано пользователем.")
+            break
+        except Exception as e:
+            print(f"Произошла ошибка при выполнении {func.__name__}: {e}")
+            warn_and_pause("Произошла ошибка, продолжаю через 10 секунд...", 10)
 
 def setup_console():
     os.system('color 0a')
@@ -57,13 +85,9 @@ def print_info(ver, name):
     print ("[                        Продолжим?                            ]")
     print("=" * 64)
 
-def setup_directories(directories):
-    for dir in directories:
-        Path(dir).mkdir(parents=True, exist_ok=True)
-
 def setup_7zip(adms):
-    seven_zip_display_version = "24.09"
-    seven_zip_download_version = "2409"
+    seven_zip_display_version = "25.01"
+    seven_zip_download_version = "2501"
 
     arch = platform.machine()
     if arch.endswith('64'):
@@ -105,13 +129,21 @@ def setup_7zip(adms):
         print("Загрузка 7-Zip...")
         os.makedirs(os.path.dirname(seven_zip_install_path), exist_ok=True)
         download_link = f"https://www.7-zip.org/a/{seven_zip_installer}"
-        response = requests.get(download_link)
-        if response.status_code == 200:
-            with open(seven_zip_install_path, 'wb') as f:
-                f.write(response.content)
-            print("7-Zip успешно загружен.")
+        if not has_internet():
+            warn_and_pause("Нет интернет-соединения, пропускаю загрузку 7-Zip.", 10)
         else:
-            raise Exception("Не удалось загрузить 7-Zip.")
+            try:
+                response = requests.get(download_link, timeout=15)
+                if response.status_code == 200:
+                    with open(seven_zip_install_path, 'wb') as f:
+                        f.write(response.content)
+                    print("7-Zip успешно загружен.")
+                else:
+                    print(f"Не удалось загрузить 7-Zip, код: {response.status_code}")
+                    warn_and_pause("Проблема при загрузке 7-Zip, продолжаю выполнение...", 10)
+            except Exception as e:
+                print(f"Ошибка при загрузке 7-Zip: {e}")
+                warn_and_pause("Ошибка сети при загрузке 7-Zip, продолжаю выполнение...", 10)
     else:
         print("Установочный файл 7-Zip уже загружен.")
 
@@ -125,25 +157,49 @@ def download_and_extract(name, temp):
     local_path = os.path.join(temp, f"{name}.zip")
     user = "u1206988_upd_win"
     password = "0912832130Ws@"
-
-    try:
-        ftp = FTP(ftp_url)
-        ftp.login(user, password)
-        with open(local_path, 'wb') as f:
-            ftp.retrbinary(f"RETR {ftp_path}", f.write)
-        ftp.quit()
-        print(f"Файл {name}.zip успешно загружен.")
-    except Exception as e:
-        raise Exception(f"Ошибка при загрузке файла: {e}")
-
-    if os.path.exists(local_path):
-        with zipfile.ZipFile(local_path, 'r') as zip_ref:
-            zip_ref.extractall(temp)
+    # Попытка загрузки архива через FTP, но при отсутствии сети или ошибке — логируем и продолжаем
+    if has_internet():
+        try:
+            ftp = FTP(ftp_url)
+            # if user not provided, attempt anonymous login
+            if not user:
+                ftp.login()
+            else:
+                ftp.login(user, password)
+            with open(local_path, 'wb') as f:
+                ftp.retrbinary(f"RETR {ftp_path}", f.write)
+            ftp.quit()
+            print(f"Файл {name}.zip успешно загружен.")
+        except Exception as e:
+            print(f"Ошибка при загрузке файла: {e}")
+            warn_and_pause("Ошибка при загрузке архива, продолжаю выполнение...", 10)
     else:
-        raise FileNotFoundError(f"Файл {local_path} не найден. Невозможно продолжить распаковку.")
+        warn_and_pause("Нет интернет-соединения, пропускаю загрузку архива.", 10)
+
+    # Если файл доступен — распаковываем, иначе продолжаем работу без исключения
+    if os.path.exists(local_path):
+        try:
+            with zipfile.ZipFile(local_path, 'r') as zip_ref:
+                zip_ref.extractall(temp)
+        except Exception as e:
+            print(f"Ошибка при распаковке архива: {e}")
+            warn_and_pause("Ошибка распаковки архива, продолжаю выполнение...", 10)
+    else:
+        print(f"Файл {local_path} не найден — пропускаю распаковку.")
+        warn_and_pause("Файл архива отсутствует, продолжаю выполнение...", 10)
 
 def copy_files(temp, main, adms, name):
-    shutil.copy(os.path.join(temp, f"{name}.ps1"), main)
+    ps1_src = os.path.join(temp, f"{name}.ps1")
+    try:
+        if os.path.exists(ps1_src):
+            shutil.copy(ps1_src, main)
+        else:
+            print(f"Файл {ps1_src} не найден, пропускаю копирование .ps1")
+            warn_and_pause("Файл .ps1 отсутствует, продолжаю выполнение...", 10)
+    except Exception as e:
+        print(f"Ошибка при копировании .ps1: {e}")
+        warn_and_pause("Ошибка при копировании .ps1, продолжаю выполнение...", 10)
+
     result = subprocess.run(["robocopy", os.path.join(temp, "add"), adms, "/MIR", "/Z", "/XO", "/R:0", "/W:5"], check=False)
     if result.returncode > 3:
         raise subprocess.CalledProcessError(result.returncode, result.args, output=result.stdout, stderr=result.stderr)

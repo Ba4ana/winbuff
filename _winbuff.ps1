@@ -57,8 +57,8 @@ Set-Location $main
 
 ## Установка 7-Zip
 # Версия 7-Zip
-$sevenZipDisplayVersion = "24.09"
-$sevenZipDownloadVersion = "2409"
+$sevenZipDisplayVersion = "25.01"
+$sevenZipDownloadVersion = "2501"
 
 # Определяем архитектуру ОС и соответствующий файл установщика
 $osArchitecture = (Get-WmiObject win32_operatingsystem).osarchitecture
