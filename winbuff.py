@@ -12,10 +12,14 @@ from ftplib import FTP
 def main():
     ver = "0051"
     name = "_winbuff"
-    main = os.path.join(os.environ['SystemRoot'], name)
+    main = r"C:\Windows\_winbuff"
     logs = os.path.join(main, "log")
     temp = os.path.join(main, "temp")
     adms = r"C:\Admins\add"
+
+    Path(main).mkdir(parents=True, exist_ok=True)
+    Path(logs).mkdir(parents=True, exist_ok=True)
+    Path(temp).mkdir(parents=True, exist_ok=True)
 
     try:
         setup_console()
