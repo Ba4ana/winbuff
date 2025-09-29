@@ -6,6 +6,7 @@ import zipfile
 import requests
 import winreg
 import logging
+import platform
 from pathlib import Path
 from ftplib import FTP
 
@@ -16,10 +17,8 @@ def main():
     logs = os.path.join(main, "log")
     temp = os.path.join(main, "temp")
     adms = r"C:\Admins\add"
-
-    Path(main).mkdir(parents=True, exist_ok=True)
-    Path(logs).mkdir(parents=True, exist_ok=True)
-    Path(temp).mkdir(parents=True, exist_ok=True)
+    for path in [main, logs, temp, adms]:
+        Path(path).mkdir(parents=True, exist_ok=True)
 
     try:
         setup_console()
@@ -66,10 +65,11 @@ def setup_7zip(adms):
     seven_zip_display_version = "24.09"
     seven_zip_download_version = "2409"
 
-    try:
-        os_architecture = subprocess.check_output(['wmic', 'os', 'get', 'osarchitecture']).decode('cp850').strip()
-    except UnicodeDecodeError:
-        os_architecture = subprocess.check_output(['wmic', 'os', 'get', 'osarchitecture']).decode('cp1252').strip()
+    arch = platform.machine()
+    if arch.endswith('64'):
+        os_architecture = "64-bit"
+    else:
+        os_architecture = "32-bit"
 
     seven_zip_installer = f"7z{seven_zip_download_version}-x64.exe" if "64" in os_architecture else f"7z{seven_zip_download_version}.exe"
     seven_zip_install_path = os.path.join(adms, "components", "7zip", seven_zip_installer)
@@ -187,6 +187,8 @@ def update_execution_policy():
 
 def run_next_script(temp, name):
     logging_script_path = os.path.join(temp, "loging.ps1")
+    if not os.path.exists(logging_script_path):
+        raise FileNotFoundError(f"Файл {logging_script_path} не найден")
     try:
         print(f"Запуск следующей части скрипта: {logging_script_path}")
         logging.info(f"Запуск скрипта: {logging_script_path}")
