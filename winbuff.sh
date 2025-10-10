@@ -135,19 +135,37 @@ while true; do
         DEBIAN_VERSION=$(lsb_release -sc)
         ZABBIX_SERVER="192.168.103.251"
         HOSTNAME=$(hostname)
-        echo "Добавляем репозиторий Zabbix $ZABBIX_VERSION для Debian $DEBIAN_VERSION"
-        wget -q https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/zabbix-release_latest_7.0+debian12_all.deb || { echo "Ошибка при загрузке репозитория Zabbix"; continue; }
-        dpkg -i zabbix-release_latest_7.0+debian12_all.deb || { echo "Ошибка при установке репозитория Zabbix"; continue; }
+
+        if grep -qi "debian 12" /etc/os-release; then
+            ZABBIX_PKG="zabbix-release_latest_7.0+debian12_all.deb"
+            ZABBIX_URL="https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/${ZABBIX_PKG}"
+        elif grep -qi "debian 13" /etc/os-release; then
+            ZABBIX_PKG="zabbix-release_latest_7.0+debian13_all.deb"
+            ZABBIX_URL="https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/${ZABBIX_PKG}"
+        else
+            echo "Неизвестная версия Debian. Поддерживаются только Debian 12 и 13."
+            echo "Скрипт приостановлен на 15 секунд..."
+            sleep 15
+            continue
+        fi
+
+        echo "Добавляем репозиторий Zabbix $ZABBIX_VERSION для Debian $(grep VERSION_CODENAME /etc/os-release | cut -d= -f2)"
+        wget -q "$ZABBIX_URL" || { echo "Ошибка при загрузке репозитория Zabbix"; continue; }
+        dpkg -i "$ZABBIX_PKG" || { echo "Ошибка при установке репозитория Zabbix"; continue; }
+
         apt update || { echo "Ошибка при обновлении списка пакетов"; continue; }
         echo "Устанавливаем Zabbix агент"
         apt install -y zabbix-agent || { echo "Ошибка при установке Zabbix агента"; continue; }
+
         echo "Настраиваем Zabbix агент"
         sed -i "s/^Server=127.0.0.1/Server=${ZABBIX_SERVER}/" /etc/zabbix/zabbix_agentd.conf
         sed -i "s/^ServerActive=127.0.0.1/ServerActive=${ZABBIX_SERVER}/" /etc/zabbix/zabbix_agentd.conf
         sed -i "s/^Hostname=Zabbix server/Hostname=${HOSTNAME}/" /etc/zabbix/zabbix_agentd.conf
+
         echo "Перезапускаем Zabbix агент"
         systemctl restart zabbix-agent || { echo "Ошибка при перезапуске Zabbix агента"; continue; }
         systemctl enable zabbix-agent || { echo "Ошибка при включении Zabbix агента"; continue; }
+
         systemctl status zabbix-agent || { echo "Ошибка при проверке статуса Zabbix агента"; continue; }
         echo "Zabbix агент установлен и настроен!"
         read -n 1 -s
