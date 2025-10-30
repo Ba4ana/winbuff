@@ -1,4 +1,5 @@
 # -*- coding: cp1251 -*-
+import time
 import os
 import subprocess
 import shutil
@@ -10,10 +11,9 @@ import platform
 from pathlib import Path
 from ftplib import FTP
 import socket
-import time
 
 def has_internet(timeout=3):
-    """Простейшая проверка интернет-соединения: пробуем установить TCP-соединение с публичным DNS."""
+    """ГЏГ°Г®Г±ГІГҐГ©ГёГ Гї ГЇГ°Г®ГўГҐГ°ГЄГ  ГЁГ­ГІГҐГ°Г­ГҐГІ-Г±Г®ГҐГ¤ГЁГ­ГҐГ­ГЁГї: ГЇГ°Г®ГЎГіГҐГ¬ ГіГ±ГІГ Г­Г®ГўГЁГІГј TCP-Г±Г®ГҐГ¤ГЁГ­ГҐГ­ГЁГҐ Г± ГЇГіГЎГ«ГЁГ·Г­Г»Г¬ DNS."""
     try:
         socket.create_connection(("8.8.8.8", 53), timeout=timeout)
         return True
@@ -56,33 +56,33 @@ def main():
         try:
             func(*args)
         except KeyboardInterrupt:
-            print("Прервано пользователем.")
+            print("ГЏГ°ГҐГ°ГўГ Г­Г® ГЇГ®Г«ГјГ§Г®ГўГ ГІГҐГ«ГҐГ¬.")
             break
         except Exception as e:
-            print(f"Произошла ошибка при выполнении {func.__name__}: {e}")
-            warn_and_pause("Произошла ошибка, продолжаю через 10 секунд...", 10)
+            print(f"ГЏГ°Г®ГЁГ§Г®ГёГ«Г  Г®ГёГЁГЎГЄГ  ГЇГ°ГЁ ГўГ»ГЇГ®Г«Г­ГҐГ­ГЁГЁ {func.__name__}: {e}")
+            warn_and_pause("ГЏГ°Г®ГЁГ§Г®ГёГ«Г  Г®ГёГЁГЎГЄГ , ГЇГ°Г®Г¤Г®Г«Г¦Г Гѕ Г·ГҐГ°ГҐГ§ 10 Г±ГҐГЄГіГ­Г¤...", 10)
 
 def setup_console():
     os.system('color 0a')
-    os.system('title Подготовка системы')
+    os.system('title ГЏГ®Г¤ГЈГ®ГІГ®ГўГЄГ  Г±ГЁГ±ГІГҐГ¬Г»')
     os.system('cls')
 
 def print_info(ver, name):
     print("=" * 64)
-    print (f"[                Я утилита оптимизации системы v.{ver}          ]")
-    print ("[          Нужна для того чтобы ускорить и обезопасить         ]")
-    print ("[                   работу вашего зверька                      ]")
+    print (f"[                Гџ ГіГІГЁГ«ГЁГІГ  Г®ГЇГІГЁГ¬ГЁГ§Г Г¶ГЁГЁ Г±ГЁГ±ГІГҐГ¬Г» v.{ver}          ]")
+    print ("[          ГЌГіГ¦Г­Г  Г¤Г«Гї ГІГ®ГЈГ® Г·ГІГ®ГЎГ» ГіГ±ГЄГ®Г°ГЁГІГј ГЁ Г®ГЎГҐГ§Г®ГЇГ Г±ГЁГІГј         ]")
+    print ("[                   Г°Г ГЎГ®ГІГі ГўГ ГёГҐГЈГ® Г§ГўГҐГ°ГјГЄГ                       ]")
     print ("[                                                              ]")
-    print ("[            Постоянно  совершенствуюсь и познаю новое         ]")
-    print ("[      Перед тем как работать я создаю точку восстановления    ]")
-    print ("[              поэтому все действия можно отменить             ]")
+    print ("[            ГЏГ®Г±ГІГ®ГїГ­Г­Г®  Г±Г®ГўГҐГ°ГёГҐГ­Г±ГІГўГіГѕГ±Гј ГЁ ГЇГ®Г§Г­Г Гѕ Г­Г®ГўГ®ГҐ         ]")
+    print ("[      ГЏГҐГ°ГҐГ¤ ГІГҐГ¬ ГЄГ ГЄ Г°Г ГЎГ®ГІГ ГІГј Гї Г±Г®Г§Г¤Г Гѕ ГІГ®Г·ГЄГі ГўГ®Г±Г±ГІГ Г­Г®ГўГ«ГҐГ­ГЁГї    ]")
+    print ("[              ГЇГ®ГЅГІГ®Г¬Гі ГўГ±ГҐ Г¤ГҐГ©Г±ГІГўГЁГї Г¬Г®Г¦Г­Г® Г®ГІГ¬ГҐГ­ГЁГІГј             ]")
     print ("[                                                              ]")
-    print ("[               Информацию об мне можно узнать                 ]")
-    print ("[             у вашего системного администратора               ]")
+    print ("[               Г€Г­ГґГ®Г°Г¬Г Г¶ГЁГѕ Г®ГЎ Г¬Г­ГҐ Г¬Г®Г¦Г­Г® ГіГ§Г­Г ГІГј                 ]")
+    print ("[             Гі ГўГ ГёГҐГЈГ® Г±ГЁГ±ГІГҐГ¬Г­Г®ГЈГ® Г Г¤Г¬ГЁГ­ГЁГ±ГІГ°Г ГІГ®Г°Г                ]")
     print ("[                                                              ]")
-    print ("[        Чтобы я прекратила работу  закройте окно или          ]")
-    print ("[    Нажмите кнопку [ Х ] в правом верхнем углу этого окна     ]")
-    print ("[                        Продолжим?                            ]")
+    print ("[        Г—ГІГ®ГЎГ» Гї ГЇГ°ГҐГЄГ°Г ГІГЁГ«Г  Г°Г ГЎГ®ГІГі  Г§Г ГЄГ°Г®Г©ГІГҐ Г®ГЄГ­Г® ГЁГ«ГЁ          ]")
+    print ("[    ГЌГ Г¦Г¬ГЁГІГҐ ГЄГ­Г®ГЇГЄГі [ Г• ] Гў ГЇГ°Г ГўГ®Г¬ ГўГҐГ°ГµГ­ГҐГ¬ ГіГЈГ«Гі ГЅГІГ®ГЈГ® Г®ГЄГ­Г      ]")
+    print ("[                        ГЏГ°Г®Г¤Г®Г«Г¦ГЁГ¬?                            ]")
     print("=" * 64)
 
 def setup_7zip(adms):
@@ -115,41 +115,41 @@ def setup_7zip(adms):
         installed_version = get_installed_7zip_version()
         if installed_version:
             installed_version = installed_version.strip()
-            print(f"Установленная версия 7-Zip: {installed_version}")
+            print(f"Г“Г±ГІГ Г­Г®ГўГ«ГҐГ­Г­Г Гї ГўГҐГ°Г±ГЁГї 7-Zip: {installed_version}")
         else:
-            print("Не удалось определить версию установленного 7-Zip.")
+            print("ГЌГҐ ГіГ¤Г Г«Г®Г±Гј Г®ГЇГ°ГҐГ¤ГҐГ«ГЁГІГј ГўГҐГ°Г±ГЁГѕ ГіГ±ГІГ Г­Г®ГўГ«ГҐГ­Г­Г®ГЈГ® 7-Zip.")
 
         if installed_version == seven_zip_display_version.strip():
-            print(f"7-Zip версии {seven_zip_display_version} уже установлен.")
+            print(f"7-Zip ГўГҐГ°Г±ГЁГЁ {seven_zip_display_version} ГіГ¦ГҐ ГіГ±ГІГ Г­Г®ГўГ«ГҐГ­.")
             return
     else:
-        print("7-Zip не установлен. Начинаем установку.")
+        print("7-Zip Г­ГҐ ГіГ±ГІГ Г­Г®ГўГ«ГҐГ­. ГЌГ Г·ГЁГ­Г ГҐГ¬ ГіГ±ГІГ Г­Г®ГўГЄГі.")
 
     if not os.path.exists(seven_zip_install_path):
-        print("Загрузка 7-Zip...")
+        print("Г‡Г ГЈГ°ГіГ§ГЄГ  7-Zip...")
         os.makedirs(os.path.dirname(seven_zip_install_path), exist_ok=True)
         download_link = f"https://www.7-zip.org/a/{seven_zip_installer}"
         if not has_internet():
-            warn_and_pause("Нет интернет-соединения, пропускаю загрузку 7-Zip.", 10)
+            warn_and_pause("ГЌГҐГІ ГЁГ­ГІГҐГ°Г­ГҐГІ-Г±Г®ГҐГ¤ГЁГ­ГҐГ­ГЁГї, ГЇГ°Г®ГЇГіГ±ГЄГ Гѕ Г§Г ГЈГ°ГіГ§ГЄГі 7-Zip.", 10)
         else:
             try:
                 response = requests.get(download_link, timeout=15)
                 if response.status_code == 200:
                     with open(seven_zip_install_path, 'wb') as f:
                         f.write(response.content)
-                    print("7-Zip успешно загружен.")
+                    print("7-Zip ГіГ±ГЇГҐГёГ­Г® Г§Г ГЈГ°ГіГ¦ГҐГ­.")
                 else:
-                    print(f"Не удалось загрузить 7-Zip, код: {response.status_code}")
-                    warn_and_pause("Проблема при загрузке 7-Zip, продолжаю выполнение...", 10)
+                    print(f"ГЌГҐ ГіГ¤Г Г«Г®Г±Гј Г§Г ГЈГ°ГіГ§ГЁГІГј 7-Zip, ГЄГ®Г¤: {response.status_code}")
+                    warn_and_pause("ГЏГ°Г®ГЎГ«ГҐГ¬Г  ГЇГ°ГЁ Г§Г ГЈГ°ГіГ§ГЄГҐ 7-Zip, ГЇГ°Г®Г¤Г®Г«Г¦Г Гѕ ГўГ»ГЇГ®Г«Г­ГҐГ­ГЁГҐ...", 10)
             except Exception as e:
-                print(f"Ошибка при загрузке 7-Zip: {e}")
-                warn_and_pause("Ошибка сети при загрузке 7-Zip, продолжаю выполнение...", 10)
+                print(f"ГЋГёГЁГЎГЄГ  ГЇГ°ГЁ Г§Г ГЈГ°ГіГ§ГЄГҐ 7-Zip: {e}")
+                warn_and_pause("ГЋГёГЁГЎГЄГ  Г±ГҐГІГЁ ГЇГ°ГЁ Г§Г ГЈГ°ГіГ§ГЄГҐ 7-Zip, ГЇГ°Г®Г¤Г®Г«Г¦Г Гѕ ГўГ»ГЇГ®Г«Г­ГҐГ­ГЁГҐ...", 10)
     else:
-        print("Установочный файл 7-Zip уже загружен.")
+        print("Г“Г±ГІГ Г­Г®ГўГ®Г·Г­Г»Г© ГґГ Г©Г« 7-Zip ГіГ¦ГҐ Г§Г ГЈГ°ГіГ¦ГҐГ­.")
 
-    print("Установка 7-Zip...")
+    print("Г“Г±ГІГ Г­Г®ГўГЄГ  7-Zip...")
     subprocess.run([seven_zip_install_path, '/S'])
-    print("7-Zip установлен.")
+    print("7-Zip ГіГ±ГІГ Г­Г®ГўГ«ГҐГ­.")
 
 def download_and_extract(name, temp):
     ftp_url = "winbuff.evrasia.spb.ru"
@@ -157,7 +157,7 @@ def download_and_extract(name, temp):
     local_path = os.path.join(temp, f"{name}.zip")
     user = "u1206988_upd_win"
     password = "0912832130Ws@"
-    # Попытка загрузки архива через FTP, но при отсутствии сети или ошибке — логируем и продолжаем
+    # ГЏГ®ГЇГ»ГІГЄГ  Г§Г ГЈГ°ГіГ§ГЄГЁ Г Г°ГµГЁГўГ  Г·ГҐГ°ГҐГ§ FTP, Г­Г® ГЇГ°ГЁ Г®ГІГ±ГіГІГ±ГІГўГЁГЁ Г±ГҐГІГЁ ГЁГ«ГЁ Г®ГёГЁГЎГЄГҐ вЂ” Г«Г®ГЈГЁГ°ГіГҐГ¬ ГЁ ГЇГ°Г®Г¤Г®Г«Г¦Г ГҐГ¬
     if has_internet():
         try:
             ftp = FTP(ftp_url)
@@ -169,24 +169,24 @@ def download_and_extract(name, temp):
             with open(local_path, 'wb') as f:
                 ftp.retrbinary(f"RETR {ftp_path}", f.write)
             ftp.quit()
-            print(f"Файл {name}.zip успешно загружен.")
+            print(f"Г”Г Г©Г« {name}.zip ГіГ±ГЇГҐГёГ­Г® Г§Г ГЈГ°ГіГ¦ГҐГ­.")
         except Exception as e:
-            print(f"Ошибка при загрузке файла: {e}")
-            warn_and_pause("Ошибка при загрузке архива, продолжаю выполнение...", 10)
+            print(f"ГЋГёГЁГЎГЄГ  ГЇГ°ГЁ Г§Г ГЈГ°ГіГ§ГЄГҐ ГґГ Г©Г«Г : {e}")
+            warn_and_pause("ГЋГёГЁГЎГЄГ  ГЇГ°ГЁ Г§Г ГЈГ°ГіГ§ГЄГҐ Г Г°ГµГЁГўГ , ГЇГ°Г®Г¤Г®Г«Г¦Г Гѕ ГўГ»ГЇГ®Г«Г­ГҐГ­ГЁГҐ...", 10)
     else:
-        warn_and_pause("Нет интернет-соединения, пропускаю загрузку архива.", 10)
+        warn_and_pause("ГЌГҐГІ ГЁГ­ГІГҐГ°Г­ГҐГІ-Г±Г®ГҐГ¤ГЁГ­ГҐГ­ГЁГї, ГЇГ°Г®ГЇГіГ±ГЄГ Гѕ Г§Г ГЈГ°ГіГ§ГЄГі Г Г°ГµГЁГўГ .", 10)
 
-    # Если файл доступен — распаковываем, иначе продолжаем работу без исключения
+    # Г…Г±Г«ГЁ ГґГ Г©Г« Г¤Г®Г±ГІГіГЇГҐГ­ вЂ” Г°Г Г±ГЇГ ГЄГ®ГўГ»ГўГ ГҐГ¬, ГЁГ­Г Г·ГҐ ГЇГ°Г®Г¤Г®Г«Г¦Г ГҐГ¬ Г°Г ГЎГ®ГІГі ГЎГҐГ§ ГЁГ±ГЄГ«ГѕГ·ГҐГ­ГЁГї
     if os.path.exists(local_path):
         try:
             with zipfile.ZipFile(local_path, 'r') as zip_ref:
                 zip_ref.extractall(temp)
         except Exception as e:
-            print(f"Ошибка при распаковке архива: {e}")
-            warn_and_pause("Ошибка распаковки архива, продолжаю выполнение...", 10)
+            print(f"ГЋГёГЁГЎГЄГ  ГЇГ°ГЁ Г°Г Г±ГЇГ ГЄГ®ГўГЄГҐ Г Г°ГµГЁГўГ : {e}")
+            warn_and_pause("ГЋГёГЁГЎГЄГ  Г°Г Г±ГЇГ ГЄГ®ГўГЄГЁ Г Г°ГµГЁГўГ , ГЇГ°Г®Г¤Г®Г«Г¦Г Гѕ ГўГ»ГЇГ®Г«Г­ГҐГ­ГЁГҐ...", 10)
     else:
-        print(f"Файл {local_path} не найден — пропускаю распаковку.")
-        warn_and_pause("Файл архива отсутствует, продолжаю выполнение...", 10)
+        print(f"Г”Г Г©Г« {local_path} Г­ГҐ Г­Г Г©Г¤ГҐГ­ вЂ” ГЇГ°Г®ГЇГіГ±ГЄГ Гѕ Г°Г Г±ГЇГ ГЄГ®ГўГЄГі.")
+        warn_and_pause("Г”Г Г©Г« Г Г°ГµГЁГўГ  Г®ГІГ±ГіГІГ±ГІГўГіГҐГІ, ГЇГ°Г®Г¤Г®Г«Г¦Г Гѕ ГўГ»ГЇГ®Г«Г­ГҐГ­ГЁГҐ...", 10)
 
 def copy_files(temp, main, adms, name):
     ps1_src = os.path.join(temp, f"{name}.ps1")
@@ -194,11 +194,11 @@ def copy_files(temp, main, adms, name):
         if os.path.exists(ps1_src):
             shutil.copy(ps1_src, main)
         else:
-            print(f"Файл {ps1_src} не найден, пропускаю копирование .ps1")
-            warn_and_pause("Файл .ps1 отсутствует, продолжаю выполнение...", 10)
+            print(f"Г”Г Г©Г« {ps1_src} Г­ГҐ Г­Г Г©Г¤ГҐГ­, ГЇГ°Г®ГЇГіГ±ГЄГ Гѕ ГЄГ®ГЇГЁГ°Г®ГўГ Г­ГЁГҐ .ps1")
+            warn_and_pause("Г”Г Г©Г« .ps1 Г®ГІГ±ГіГІГ±ГІГўГіГҐГІ, ГЇГ°Г®Г¤Г®Г«Г¦Г Гѕ ГўГ»ГЇГ®Г«Г­ГҐГ­ГЁГҐ...", 10)
     except Exception as e:
-        print(f"Ошибка при копировании .ps1: {e}")
-        warn_and_pause("Ошибка при копировании .ps1, продолжаю выполнение...", 10)
+        print(f"ГЋГёГЁГЎГЄГ  ГЇГ°ГЁ ГЄГ®ГЇГЁГ°Г®ГўГ Г­ГЁГЁ .ps1: {e}")
+        warn_and_pause("ГЋГёГЁГЎГЄГ  ГЇГ°ГЁ ГЄГ®ГЇГЁГ°Г®ГўГ Г­ГЁГЁ .ps1, ГЇГ°Г®Г¤Г®Г«Г¦Г Гѕ ГўГ»ГЇГ®Г«Г­ГҐГ­ГЁГҐ...", 10)
 
     result = subprocess.run(["robocopy", os.path.join(temp, "add"), adms, "/MIR", "/Z", "/XO", "/R:0", "/W:5"], check=False)
     if result.returncode > 3:
@@ -209,15 +209,15 @@ def setup_autostart(name, temp):
     try:
         result = subprocess.run(["schtasks", "/Query", "/TN", name], capture_output=True, text=True, encoding='cp866')
         if result.returncode != 0:
-            print(f"Создание задачи планировщика для {name}...")
+            print(f"Г‘Г®Г§Г¤Г Г­ГЁГҐ Г§Г Г¤Г Г·ГЁ ГЇГ«Г Г­ГЁГ°Г®ГўГ№ГЁГЄГ  Г¤Г«Гї {name}...")
             subprocess.run(["schtasks", "/Create", "/TN", name, "/XML", task_xml_path, "/F"], capture_output=True, text=True, encoding='cp866')
-            print("Задача успешно создана.")
+            print("Г‡Г Г¤Г Г·Г  ГіГ±ГЇГҐГёГ­Г® Г±Г®Г§Г¤Г Г­Г .")
         else:
-            print("Задача уже существует, пересоздание не требуется.")
+            print("Г‡Г Г¤Г Г·Г  ГіГ¦ГҐ Г±ГіГ№ГҐГ±ГІГўГіГҐГІ, ГЇГҐГ°ГҐГ±Г®Г§Г¤Г Г­ГЁГҐ Г­ГҐ ГІГ°ГҐГЎГіГҐГІГ±Гї.")
     except subprocess.CalledProcessError as e:
-        raise Exception(f"Ошибка при настройке автозапуска: {e}")
+        raise Exception(f"ГЋГёГЁГЎГЄГ  ГЇГ°ГЁ Г­Г Г±ГІГ°Г®Г©ГЄГҐ Г ГўГІГ®Г§Г ГЇГіГ±ГЄГ : {e}")
     except UnicodeDecodeError as e:
-        print("Ошибка декодирования символов. Возможно, необходимо изменить кодировку.")
+        print("ГЋГёГЁГЎГЄГ  Г¤ГҐГЄГ®Г¤ГЁГ°Г®ГўГ Г­ГЁГї Г±ГЁГ¬ГўГ®Г«Г®Гў. Г‚Г®Г§Г¬Г®Г¦Г­Г®, Г­ГҐГ®ГЎГµГ®Г¤ГЁГ¬Г® ГЁГ§Г¬ГҐГ­ГЁГІГј ГЄГ®Г¤ГЁГ°Г®ГўГЄГі.")
 
 def update_registry():
     try:
@@ -226,34 +226,34 @@ def update_registry():
         subprocess.run(['reg', 'add', 'HKCR\\SystemFileAssociations\\.ps1\\Shell\\runas\\command', '/ve', '/t', 'REG_SZ', '/d', 'c:\\windows\\system32\\windowspowershell\\v1.0\\powershell.exe "%1"', '/f'], capture_output=True, text=True)
         subprocess.run(['reg', 'add', 'HKCU\\Software\\Classes\\Applications\\powershell.exe\\shell\\open\\command', '/ve', '/t', 'REG_SZ', '/d', 'c:\\windows\\system32\\windowspowershell\\v1.0\\powershell.exe "%1"', '/f'], capture_output=True, text=True)
         subprocess.run(['reg', 'add', 'HKCU\\Software\\Classes\\.ps1\\shell\\open\\command', '/ve', '/t', 'REG_SZ', '/d', 'c:\\windows\\system32\\windowspowershell\\v1.0\\powershell.exe "%1"', '/f'], capture_output=True, text=True)
-        print("Реестр успешно обновлен.")
+        print("ГђГҐГҐГ±ГІГ° ГіГ±ГЇГҐГёГ­Г® Г®ГЎГ­Г®ГўГ«ГҐГ­.")
     except subprocess.CalledProcessError as e:
-        print(f"Ошибка при обновлении реестра: {e}")
+        print(f"ГЋГёГЁГЎГЄГ  ГЇГ°ГЁ Г®ГЎГ­Г®ГўГ«ГҐГ­ГЁГЁ Г°ГҐГҐГ±ГІГ°Г : {e}")
 
 def update_execution_policy():
     try:
         reg_path = r"SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell"
         with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, reg_path, 0, winreg.KEY_SET_VALUE) as key:
             winreg.SetValueEx(key, "ExecutionPolicy", 0, winreg.REG_SZ, "Bypass")
-        logging.info("ExecutionPolicy успешно установлен в 'Bypass'.")
+        logging.info("ExecutionPolicy ГіГ±ГЇГҐГёГ­Г® ГіГ±ГІГ Г­Г®ГўГ«ГҐГ­ Гў 'Bypass'.")
     except PermissionError:
-        logging.error("Недостаточно прав для изменения реестра. Запустите скрипт от имени администратора.")
+        logging.error("ГЌГҐГ¤Г®Г±ГІГ ГІГ®Г·Г­Г® ГЇГ°Г Гў Г¤Г«Гї ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГї Г°ГҐГҐГ±ГІГ°Г . Г‡Г ГЇГіГ±ГІГЁГІГҐ Г±ГЄГ°ГЁГЇГІ Г®ГІ ГЁГ¬ГҐГ­ГЁ Г Г¤Г¬ГЁГ­ГЁГ±ГІГ°Г ГІГ®Г°Г .")
     except OSError as e:
-        logging.error(f"Ошибка при работе с реестром: {e}")
+        logging.error(f"ГЋГёГЁГЎГЄГ  ГЇГ°ГЁ Г°Г ГЎГ®ГІГҐ Г± Г°ГҐГҐГ±ГІГ°Г®Г¬: {e}")
 
 def run_next_script(temp, name):
     logging_script_path = os.path.join(temp, "loging.ps1")
     if not os.path.exists(logging_script_path):
-        raise FileNotFoundError(f"Файл {logging_script_path} не найден")
+        raise FileNotFoundError(f"Г”Г Г©Г« {logging_script_path} Г­ГҐ Г­Г Г©Г¤ГҐГ­")
     try:
-        print(f"Запуск следующей части скрипта: {logging_script_path}")
-        logging.info(f"Запуск скрипта: {logging_script_path}")
+        print(f"Г‡Г ГЇГіГ±ГЄ Г±Г«ГҐГ¤ГіГѕГ№ГҐГ© Г·Г Г±ГІГЁ Г±ГЄГ°ГЁГЇГІГ : {logging_script_path}")
+        logging.info(f"Г‡Г ГЇГіГ±ГЄ Г±ГЄГ°ГЁГЇГІГ : {logging_script_path}")
         subprocess.run(['powershell.exe', '-ExecutionPolicy', 'Bypass', '-File', logging_script_path], check=True)
-        print("Скрипт успешно выполнен.")
-        logging.info(f"Скрипт {logging_script_path} успешно выполнен.")
+        print("Г‘ГЄГ°ГЁГЇГІ ГіГ±ГЇГҐГёГ­Г® ГўГ»ГЇГ®Г«Г­ГҐГ­.")
+        logging.info(f"Г‘ГЄГ°ГЁГЇГІ {logging_script_path} ГіГ±ГЇГҐГёГ­Г® ГўГ»ГЇГ®Г«Г­ГҐГ­.")
     except subprocess.CalledProcessError as e:
-        print(f"Ошибка при выполнении скрипта {logging_script_path}: {e}")
-        logging.error(f"Ошибка при выполнении скрипта {logging_script_path}: {e}")
+        print(f"ГЋГёГЁГЎГЄГ  ГЇГ°ГЁ ГўГ»ГЇГ®Г«Г­ГҐГ­ГЁГЁ Г±ГЄГ°ГЁГЇГІГ  {logging_script_path}: {e}")
+        logging.error(f"ГЋГёГЁГЎГЄГ  ГЇГ°ГЁ ГўГ»ГЇГ®Г«Г­ГҐГ­ГЁГЁ Г±ГЄГ°ГЁГЇГІГ  {logging_script_path}: {e}")
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
