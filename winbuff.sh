@@ -18,8 +18,9 @@ while true; do
     echo "1 - Первичная настройка"
     echo "2 - Установка обновлений"
     echo "3 - Настройка автообновления"
-    echo "4 - Установка Zabbix"
-    echo "5 - Настройка интерфейса eth0"
+    echo "4 - Удаление автообновления"
+    echo "5 - Установка Zabbix"
+    echo "6 - Настройка интерфейса eth0"
     echo "0 - Выход"
     read -p "Введите номер этапа: " stage
 
@@ -129,6 +130,29 @@ while true; do
 #         IV         #
 ######################
     elif [[ "$stage" == "4" ]]; then
+        echo "Удаляем автоматическое обновление..."
+
+        # Отключаем пакет unattended-upgrades
+        systemctl stop unattended-upgrades.service
+        systemctl disable unattended-upgrades.service
+        systemctl disable apt-daily.timer
+        systemctl disable apt-daily-upgrade.timer
+
+        # Удаляем пакет и его конфигурацию
+        apt purge -y unattended-upgrades
+        apt autoremove -y
+        apt clean -y
+
+        # Удаляем созданные ранее файлы и настройки
+        rm -f /etc/apt/apt.conf.d/20auto-upgrades
+        rm -f /etc/apt/apt.conf.d/50unattended-upgrades
+
+        echo "Автоматическое обновление успешно удалено."
+        sleep 10
+######################
+#          V         #
+######################
+    elif [[ "$stage" == "5" ]]; then
         echo "Перед установкой Zabbix нажмите любую клавишу для продолжения..."
         read -n 1 -s
         ZABBIX_VERSION="7.0"
@@ -171,9 +195,9 @@ while true; do
         read -n 1 -s
 
 ######################
-#          V         #
+#         VI         #
 ######################
-    elif [[ "$stage" == "5" ]]; then
+    elif [[ "$stage" == "6" ]]; then
         echo "Настройка наименования сетевого интерфейса как eth0..."
 
         if grep -q 'net.ifnames=0' /etc/default/grub; then
