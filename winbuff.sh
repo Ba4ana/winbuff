@@ -27,6 +27,7 @@ while true; do
 ######################
 #          I         #
 ######################
+
     if [[ "$stage" == "1" ]]; then
         echo "Устанавливаем необходимые пакеты..."
         sed -i '/^deb cdrom:/d' /etc/apt/sources.list
@@ -88,6 +89,7 @@ while true; do
 ######################
 #         II         #
 ######################
+
     elif [[ "$stage" == "2" ]]; then
         echo "Установка обновлений..."
         apt-get update && apt-get upgrade -y
@@ -98,6 +100,7 @@ while true; do
 ######################
 #         III        #
 ######################
+
     elif [[ "$stage" == "3" ]]; then
         echo "Настраиваем автоматическое обновление..."
         apt update
@@ -129,6 +132,7 @@ while true; do
 ######################
 #         IV         #
 ######################
+
     elif [[ "$stage" == "4" ]]; then
         echo "Удаляем автоматическое обновление..."
 
@@ -149,31 +153,34 @@ while true; do
 
         echo "Автоматическое обновление успешно удалено."
         sleep 10
+
 ######################
 #          V         #
 ######################
+
     elif [[ "$stage" == "5" ]]; then
         echo "Перед установкой Zabbix нажмите любую клавишу для продолжения..."
         read -n 1 -s
         ZABBIX_VERSION="7.0"
-        DEBIAN_VERSION=$(lsb_release -sc)
         ZABBIX_SERVER="192.168.103.251"
         HOSTNAME=$(hostname)
+        DEBIAN_VERSION_ID=$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '"')
+        DEBIAN_CODENAME=$(grep '^VERSION_CODENAME=' /etc/os-release | cut -d= -f2)
 
-        if grep -qi "debian 12" /etc/os-release; then
-            ZABBIX_PKG="zabbix-release_latest_7.0+debian12_all.deb"
-            ZABBIX_URL="https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/${ZABBIX_PKG}"
-        elif grep -qi "debian 13" /etc/os-release; then
-            ZABBIX_PKG="zabbix-release_latest_7.0+debian13_all.deb"
-            ZABBIX_URL="https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/${ZABBIX_PKG}"
+        if [[ "$DEBIAN_VERSION_ID" == "12" ]]; then
+            ZABBIX_PKG="zabbix-release_latest_${ZABBIX_VERSION}+debian12_all.deb"
+        elif [[ "$DEBIAN_VERSION_ID" == "13" ]]; then
+            ZABBIX_PKG="zabbix-release_latest_${ZABBIX_VERSION}+debian13_all.deb"
         else
-            echo "Неизвестная версия Debian. Поддерживаются только Debian 12 и 13."
+            echo "Неизвестная версия Debian ($DEBIAN_VERSION_ID, codename: $DEBIAN_CODENAME)"
+            echo "Поддерживаются только Debian 12 и 13."
             echo "Скрипт приостановлен на 15 секунд..."
             sleep 15
             continue
         fi
 
-        echo "Добавляем репозиторий Zabbix $ZABBIX_VERSION для Debian $(grep VERSION_CODENAME /etc/os-release | cut -d= -f2)"
+        ZABBIX_URL="https://repo.zabbix.com/zabbix/${ZABBIX_VERSION}/debian/pool/main/z/zabbix-release/${ZABBIX_PKG}"
+        echo "Добавляем репозиторий Zabbix ${ZABBIX_VERSION} для Debian ${DEBIAN_CODENAME}"
         wget -q "$ZABBIX_URL" || { echo "Ошибка при загрузке репозитория Zabbix"; continue; }
         dpkg -i "$ZABBIX_PKG" || { echo "Ошибка при установке репозитория Zabbix"; continue; }
 
@@ -197,6 +204,7 @@ while true; do
 ######################
 #         VI         #
 ######################
+
     elif [[ "$stage" == "6" ]]; then
         echo "Настройка наименования сетевого интерфейса как eth0..."
 
@@ -228,6 +236,7 @@ EOF
 ######################
 #          N         #
 ######################
+
     elif [[ "$stage" == "0" ]]; then
         echo "Выход из скрипта."
         exit 0
