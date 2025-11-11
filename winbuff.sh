@@ -103,6 +103,10 @@ while true; do
 
     elif [[ "$stage" == "3" ]]; then
         echo "Настраиваем автоматическое обновление..."
+        # Удаляет старые ядра, которые больше не используются
+        # Удаляет пакеты, которые больше не нужны
+        # После обновления пакетов, требующих перезагрузки, система автоматически перезагружается.
+        # Автомтаическая перезагрузка в 04:00
         apt update
         apt install unattended-upgrades -y
         dpkg-reconfigure -f noninteractive unattended-upgrades
@@ -211,7 +215,7 @@ while true; do
         if grep -q 'net.ifnames=0' /etc/default/grub; then
             echo "Параметр net.ifnames=0 уже установлен в GRUB"
         else
-            sed -i '/^GRUB_CMDLINE_LINUX=/ s/"$/ net.ifnames=0"/' /etc/default/grub
+            sed -i '/^GRUB_CMDLINE_LINUX=/ s/"$/net.ifnames=0"/' /etc/default/grub
             echo "Добавлен параметр net.ifnames=0 в GRUB"
             grub-mkconfig -o /boot/grub/grub.cfg || { echo "Ошибка при обновлении конфигурации GRUB"; continue; }
         fi
@@ -232,6 +236,26 @@ EOF
 
         echo "Настройка интерфейса eth0 завершена. Требуется перезагрузка системы для применения изменений."
         read -n 1 -s -p "Нажмите любую клавишу для продолжения..."
+
+######################
+#         VII        #
+######################
+
+
+######################
+#         VIII       #
+######################
+
+
+######################
+#         IX         #
+######################
+
+
+######################
+#         X          #
+######################
+
 
 ######################
 #          N         #
