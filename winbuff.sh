@@ -21,6 +21,8 @@ while true; do
     echo "4 - Удаление автообновления"
     echo "5 - Установка Zabbix"
     echo "6 - Настройка интерфейса eth0"
+    echo "9 - Разрешить подключение root через sftp"
+    echo "10 - Стереть историяю команд"
     echo "0 - Выход"
     read -p "Введите номер этапа: " stage
 
@@ -251,11 +253,19 @@ EOF
 #         IX         #
 ######################
 
+    elif [[ "$stage" == "9" ]]; then
+        # Разрешить sftp по root
+        sed -i 's/^#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config 
+        systemctl restart ssh
+        systemctl restart sshd
 
 ######################
 #         X          #
 ######################
 
+    elif [[ "$stage" == "10" ]]; then
+        # Стереть всю историю
+        echo>~/.bash_history
 
 ######################
 #          N         #
