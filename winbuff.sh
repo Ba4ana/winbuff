@@ -266,6 +266,7 @@ EOF
     elif [[ "$stage" == "10" ]]; then
         # Стереть всю историю
         echo>~/.bash_history
+        clear
 
 ######################
 #          N         #
