@@ -258,6 +258,7 @@ EOF
         sed -i 's/^#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config 
         systemctl restart ssh
         systemctl restart sshd
+fi
 
 ######################
 #         X          #
@@ -267,6 +268,8 @@ EOF
         # Стереть всю историю
         echo>~/.bash_history
         clear
+        echo "История команд и консоль полностью очищены."
+fi
 
 ######################
 #          N         #
