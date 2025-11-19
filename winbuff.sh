@@ -7,11 +7,7 @@ YELLOW="\e[33m"
 BLUE="\e[34m"
 RESET="\e[0m"
 
-### Проверка на Debian (строгая)
-if ! grep -q '^ID=debian' /etc/os-release ; then
-    echo -e "${RED}Этот скрипт работает только на Debian 12/13${RESET}"
-    exit 1
-fi
+
 
 ### Проверка root
 if [[ $EUID -ne 0 ]]; then
