@@ -1,195 +1,177 @@
 #!/bin/bash
 
-# Проверка только на Debian
-OS_ID=$(grep -E '^ID=' /etc/os-release | cut -d= -f2 | tr -d '"')
-if [[ "$OS_ID" != "debian" ]]; then
-    echo "Этот скрипт предназначен только для Debian"
+### Цвета
+RED="\e[31m"
+GREEN="\e[32m"
+YELLOW="\e[33m"
+BLUE="\e[34m"
+RESET="\e[0m"
+
+### Проверка на Debian (строгая)
+if ! grep -q '^ID=debian' /etc/os-release ; then
+    echo -e "${RED}Этот скрипт работает только на Debian 12/13${RESET}"
     exit 1
 fi
 
-# Проверка root прав
+### Проверка root
 if [[ $EUID -ne 0 ]]; then
-    echo "Этот скрипт должен быть запущен с правами root"
+    echo -e "${RED}Скрипт должен быть запущен от root${RESET}"
     exit 1
 fi
 
-# Функция отображения системной информации
-system_info() {
-    DISTRO=$(grep -E '^PRETTY_NAME=' /etc/os-release | cut -d= -f2 | tr -d '"')
-    HOST=$(hostname)
-    IP=$(hostname -I | awk '{print $1}')
-    LOAD=$(uptime | awk -F'load average:' '{print $2}' | sed 's/^ //')
-    MEM=$(free -h | awk '/Mem:/ {print $3 "/" $2}')
+### Информация о системе при запуске
+DISTRO=$(grep '^PRETTY_NAME=' /etc/os-release | cut -d= -f2 | tr -d '"')
+HOST=$(hostname)
+IP=$(hostname -I | awk '{print $1}')
+LOAD=$(uptime | awk -F'load average:' '{print $2}' | sed 's/^ //')
+MEM_TOTAL=$(grep MemTotal /proc/meminfo | awk '{printf "%.0f\n", $2/1024}')
+MEM_FREE=$(grep MemAvailable /proc/meminfo | awk '{printf "%.0f\n", $2/1024}')
+MEM_USED=$((MEM_TOTAL - MEM_FREE))
+MEM_PERC=$(( MEM_USED * 100 / MEM_TOTAL ))
 
-    echo ""
-    echo "========== СИСТЕМНАЯ ИНФОРМАЦИЯ =========="
-    echo "Дистрибутив  : $DISTRO"
-    echo "Hostname     : $HOST"
-    echo "IP адрес     : $IP"
-    echo "Load Average : $LOAD"
-    echo "RAM usage    : $MEM"
-    echo "=========================================="
-    echo ""
-}
+clear
+echo -e "${BLUE}============================================================${RESET}"
+echo -e "${GREEN}   SYSTEM INFORMATION${RESET}"
+echo -e "${BLUE}============================================================${RESET}"
+echo -e "${YELLOW}Distro:           ${RESET}${DISTRO}"
+echo -e "${YELLOW}Hostname:         ${RESET}${HOST}"
+echo -e "${YELLOW}IP:               ${RESET}${IP}"
+echo -e "${YELLOW}Load average:     ${RESET}${LOAD}"
+echo -e "${YELLOW}RAM:              ${RESET}${MEM_USED}MB / ${MEM_TOTAL}MB (${MEM_PERC}%)"
+echo -e "${BLUE}============================================================${RESET}"
+sleep 3
 
-# Основной цикл
+### Меню
 while true; do
-    system_info
+    echo ""
+    echo -e "${GREEN}Выберите этап:${RESET}"
+    echo -e "${YELLOW}1${RESET} - Первичная настройка"
+    echo -e "${YELLOW}2${RESET} - Установка обновлений"
+    echo -e "${YELLOW}3${RESET} - Настройка автообновления"
+    echo -e "${YELLOW}4${RESET} - Удаление автообновления"
+    echo -e "${YELLOW}5${RESET} - Установка Zabbix"
+    echo -e "${YELLOW}6${RESET} - Настройка eth0"
+    echo -e "${YELLOW}9${RESET} - SFTP root"
+    echo -e "${YELLOW}10${RESET} - Очистить историю"
+    echo -e "${YELLOW}0${RESET} - Выход"
+    read -p "Введите номер: " stage
 
-    echo "Выберите этап установки:"
-    echo "1 - Первичная настройка"
-    echo "2 - Установка обновлений"
-    echo "3 - Настройка автообновления"
-    echo "4 - Удаление автообновления"
-    echo "5 - Установка Zabbix"
-    echo "6 - Настройка интерфейса eth0"
-    echo "9 - Разрешить подключение root через sftp"
-    echo "10 - Стереть историю команд"
-    echo "0 - Выход"
-    read -p "Введите номер этапа: " stage
-
-########################################
-### I — ПЕРВИЧНАЯ НАСТРОЙКА
-########################################
+###################### 1 ######################
 if [[ "$stage" == "1" ]]; then
-    echo "Устанавливаем необходимые пакеты..."
+    echo -e "${BLUE}Устанавливаем пакеты...${RESET}"
     sed -i '/^deb cdrom:/d' /etc/apt/sources.list
     apt update && apt-get update
     apt-get autoremove -y && apt-get clean -y
-    apt install -y sudo curl socat git wget lnav htop mc whois gnupg2 ncdu console-cyrillic
+    apt-get install -y sudo curl socat git wget lnav htop mc whois gnupg2 ncdu console-cyrillic
 
-    echo "Настройка истории команд..."
-    for user in root tech; do
-        HOME_DIR=$(eval echo ~$user)
-        [ -d "$HOME_DIR" ] || continue
-        [ -f "$HOME_DIR/.bash_profile" ] || touch "$HOME_DIR/.bash_profile"
-
-        {
-            echo 'export HISTTIMEFORMAT="%d/%m/%y %T "'
-            echo 'export HISTSIZE=1999'
-            echo 'export HISTFILESIZE=1999'
-            echo 'export HISTCONTROL=ignoreboth:erasedups'
-            echo "export HISTIGNORE='shutdown:reboot:history*:exit:ls:mc:htop:apt*'"
-            echo "PROMPT_COMMAND='history -a'"
-        } >> "$HOME_DIR/.bash_profile"
-
-        chown "$user":"$user" "$HOME_DIR/.bash_profile" 2>/dev/null
+    echo -e "${BLUE}Настройка истории...${RESET}"
+    for USER_HOME in /root /home/tech; do
+        if [ -d "$USER_HOME" ]; then
+            touch $USER_HOME/.bash_profile
+            touch $USER_HOME/.bashrc
+            sed -i '/^export HIST/d' $USER_HOME/.bash_profile
+            grep -qx 'export HISTTIMEFORMAT="%d/%m/%y %T "' $USER_HOME/.bash_profile || echo 'export HISTTIMEFORMAT="%d/%m/%y %T "' >> $USER_HOME/.bash_profile
+            grep -qx 'export HISTSIZE=1999' $USER_HOME/.bash_profile || echo 'export HISTSIZE=1999' >> $USER_HOME/.bash_profile
+            grep -qx 'export HISTFILESIZE=1999' $USER_HOME/.bash_profile || echo 'export HISTFILESIZE=1999' >> $USER_HOME/.bash_profile
+            grep -qx 'export HISTCONTROL=ignoreboth:erasedups' $USER_HOME/.bash_profile || echo 'export HISTCONTROL=ignoreboth:erasedups' >> $USER_HOME/.bash_profile
+            grep -Fxq "export HISTIGNORE='shutdown:reboot:history*:exit:ls:mc:htop:apt*'" $USER_HOME/.bash_profile || echo "export HISTIGNORE='shutdown:reboot:history*:exit:ls:mc:htop:apt*'" >> $USER_HOME/.bash_profile
+            grep -qx "PROMPT_COMMAND='history -a'" $USER_HOME/.bash_profile || echo "PROMPT_COMMAND='history -a'" >> $USER_HOME/.bash_profile
+        fi
     done
 
-    echo "Отключаем IPv6..."
-    echo "net.ipv6.conf.all.disable_ipv6 = 1" > /etc/sysctl.d/disable-ipv6.conf
-    echo "net.ipv6.conf.default.disable_ipv6 = 1" >> /etc/sysctl.d/disable-ipv6.conf
+    echo -e "${BLUE}Отключаем IPv6...${RESET}"
+    cat > /etc/sysctl.d/disable-ipv6.conf <<EOF
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+EOF
     sysctl --system
 
-    echo "Настраиваем sudo без пароля для tech..."
-    if ! grep -q '^tech\s\+ALL=(ALL)\s\+NOPASSWD:ALL' /etc/sudoers; then
-        echo "tech    ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+    echo -e "${BLUE}Настройка sudo для tech...${RESET}"
+    if ! grep -q '^tech\s\+ALL=' /etc/sudoers ; then
+        echo "tech    ALL=(ALL)    NOPASSWD:ALL" >> /etc/sudoers
     fi
+    echo -e "${GREEN}Этап 1 завершен!${RESET}"
 
-    echo "Этап 1 завершен!"
-
-########################################
-### II — ОБНОВЛЕНИЕ СИСТЕМЫ
-########################################
+###################### 2 ######################
 elif [[ "$stage" == "2" ]]; then
-    echo "Установка обновлений..."
-    apt update && apt-get update
-    apt upgrade -y
-    apt dist-upgrade -y
+    echo -e "${BLUE}Обновляем систему...${RESET}"
+    apt update && apt upgrade -y && apt dist-upgrade -y
     apt autoremove -y && apt clean -y
-    echo "Этап 2 завершен!"
+    echo -e "${GREEN}Этап 2 завершен${RESET}"
 
-########################################
-### III — НАСТРОЙКА АВТООБНОВЛЕНИЯ
-########################################
+###################### 3 ######################
 elif [[ "$stage" == "3" ]]; then
-    echo "Настраиваем автообновление..."
-
+    echo -e "${BLUE}Настраиваем автообновление...${RESET}"
     apt update
-    apt install -y unattended-upgrades
+    apt install unattended-upgrades -y
     dpkg-reconfigure -f noninteractive unattended-upgrades
 
-    UPG="/etc/apt/apt.conf.d/50unattended-upgrades"
+    CONF="/etc/apt/apt.conf.d/50unattended-upgrades"
+    declare -A cfg=(
+        ["Unattended-Upgrade::Remove-Unused-kernel-Packages"]="true"
+        ["Unattended-Upgrade::Remove-Unused-Dependencies"]="true"
+        ["Unattended-Upgrade::Automatic-Reboot"]="true"
+        ["Unattended-Upgrade::Automatic-Reboot-Time"]="\"04:00\""
+    )
+    for key in "${!cfg[@]}"; do
+        if ! grep -q "$key" "$CONF"; then
+            echo "$key \"${cfg[$key]}\";" >> "$CONF"
+        fi
+    done
+    echo -e "${GREEN}Автообновление включено${RESET}"
 
-    echo 'Unattended-Upgrade::Remove-Unused-kernel-Packages "true";' >> $UPG
-    echo 'Unattended-Upgrade::Remove-Unused-Dependencies "true";' >> $UPG
-    echo 'Unattended-Upgrade::Automatic-Reboot "true";' >> $UPG
-    echo 'Unattended-Upgrade::Automatic-Reboot-Time "04:00";' >> $UPG
-
-    echo "Автоматическое обновление настроено."
-
-########################################
-### IV — УДАЛЕНИЕ АВТООБНОВЛЕНИЯ
-########################################
+###################### 4 ######################
 elif [[ "$stage" == "4" ]]; then
-    echo "Удаляем автоматическое обновление..."
-
+    echo -e "${BLUE}Удаляем автообновление...${RESET}"
     systemctl stop unattended-upgrades.service
     systemctl disable unattended-upgrades.service
-    systemctl disable apt-daily.timer
-    systemctl disable apt-daily-upgrade.timer
-
+    systemctl disable apt-daily.timer apt-daily-upgrade.timer
     apt purge -y unattended-upgrades
     apt autoremove -y
-    apt clean -y
-
     rm -f /etc/apt/apt.conf.d/20auto-upgrades
     rm -f /etc/apt/apt.conf.d/50unattended-upgrades
+    echo -e "${GREEN}Автообновление удалено${RESET}"
 
-    echo "Удалено успешно."
-
-########################################
-### V — УСТАНОВКА ZABBIX
-########################################
+###################### 5 ######################
 elif [[ "$stage" == "5" ]]; then
-    echo "Установка Zabbix..."
-    read -n 1 -s
-
-    ZABBIX_VERSION="7.0"
-    ZABBIX_SERVER="192.168.103.251"
-    HOSTNAME=$(hostname)
+    echo -e "${BLUE}Устанавливаем Zabbix...${RESET}"
+    ZVER="7.0"
+    SERVER="192.168.103.251"
+    HOST=$(hostname)
     VER=$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '"')
 
-    if [[ "$VER" == "12" ]]; then
-        PKG="zabbix-release_latest_${ZABBIX_VERSION}+debian12_all.deb"
-    elif [[ "$VER" == "13" ]]; then
-        PKG="zabbix-release_latest_${ZABBIX_VERSION}+debian13_all.deb"
-    else
-        echo "Поддерживаются только Debian 12 и 13."
-        sleep 10
+    if [[ "$VER" != "12" && "$VER" != "13" ]]; then
+        echo -e "${RED}Поддерживается только Debian 12/13${RESET}"
+        sleep 5
         continue
     fi
 
-    URL="https://repo.zabbix.com/zabbix/${ZABBIX_VERSION}/debian/pool/main/z/zabbix-release/${PKG}"
+    PKG="zabbix-release_latest_${ZVER}+debian${VER}_all.deb"
+    URL="https://repo.zabbix.com/zabbix/${ZVER}/debian/pool/main/z/zabbix-release/${PKG}"
 
-    wget -q "$URL" || { echo "Ошибка загрузки"; continue; }
-    dpkg -i "$PKG" || { echo "Ошибка установки"; continue; }
-
+    wget -q "$URL" && dpkg -i "$PKG"
     apt update
     apt install -y zabbix-agent
 
-    sed -i "s/^Server=.*/Server=$ZABBIX_SERVER/" /etc/zabbix/zabbix_agentd.conf
-    sed -i "s/^ServerActive=.*/ServerActive=$ZABBIX_SERVER/" /etc/zabbix/zabbix_agentd.conf
-    sed -i "s/^Hostname=.*/Hostname=$HOSTNAME/" /etc/zabbix/zabbix_agentd.conf
+    sed -i "s/^Server=.*/Server=${SERVER}/" /etc/zabbix/zabbix_agentd.conf
+    sed -i "s/^ServerActive=.*/ServerActive=${SERVER}/" /etc/zabbix/zabbix_agentd.conf
+    sed -i "s/^Hostname=.*/Hostname=${HOST}/" /etc/zabbix/zabbix_agentd.conf
 
     systemctl restart zabbix-agent
     systemctl enable zabbix-agent
+    echo -e "${GREEN}Zabbix установлен${RESET}"
 
-    echo "Zabbix установлен."
-
-########################################
-### VI — eth0
-########################################
+###################### 6 ######################
 elif [[ "$stage" == "6" ]]; then
-    echo "Настройка eth0..."
+    echo -e "${BLUE}Настройка eth0...${RESET}"
 
     if ! grep -q 'net.ifnames=0' /etc/default/grub; then
-        sed -i 's/GRUB_CMDLINE_LINUX="/GRUB_CMDLINE_LINUX="net.ifnames=0 /' /etc/default/grub
+        sed -i '/GRUB_CMDLINE_LINUX=/ s/"$/ net.ifnames=0"/' /etc/default/grub
         grub-mkconfig -o /boot/grub/grub.cfg
     fi
 
     if ! grep -q '^iface eth0 inet dhcp' /etc/network/interfaces; then
-        cat << EOF >> /etc/network/interfaces
+        cat <<EOF >> /etc/network/interfaces
 
 allow-hotplug eth0
 iface eth0 inet dhcp
@@ -197,33 +179,28 @@ EOF
     fi
 
     systemctl restart networking
-    echo "Требуется перезагрузка."
+    echo -e "${GREEN}Готово. Требуется перезагрузка.${RESET}"
 
-########################################
-### IX — SFTP ROOT
-########################################
+###################### 9 ######################
 elif [[ "$stage" == "9" ]]; then
     sed -i 's/^#PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
     systemctl restart sshd
-    echo "Root SFTP разрешён."
+    echo -e "${GREEN}SFTP root разрешён${RESET}"
 
-########################################
-### X — ОЧИСТКА ИСТОРИИ
-########################################
+###################### 10 ######################
 elif [[ "$stage" == "10" ]]; then
     echo > ~/.bash_history
     history -c
     clear
-    echo "История очищена."
+    echo -e "${GREEN}История очищена${RESET}"
 
-########################################
-# ВЫХОД
-########################################
+###################### EXIT ######################
 elif [[ "$stage" == "0" ]]; then
+    echo -e "${GREEN}Выход...${RESET}"
     exit 0
 
 else
-    echo "Некорректный ввод."
+    echo -e "${RED}Некорректный ввод${RESET}"
 fi
 
 done
