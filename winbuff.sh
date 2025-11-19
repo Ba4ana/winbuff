@@ -8,7 +8,6 @@ BLUE="\e[34m"
 RESET="\e[0m"
 
 
-
 ### Проверка root
 if [[ $EUID -ne 0 ]]; then
     echo -e "${RED}Скрипт должен быть запущен от root${RESET}"
