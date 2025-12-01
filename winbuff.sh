@@ -134,24 +134,19 @@ elif [[ "$stage" == "5" ]]; then
     SERVER="192.168.103.251"
     HOST=$(hostname)
     VER=$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '"')
-
     if [[ "$VER" != "12" && "$VER" != "13" ]]; then
         echo -e "${RED}Поддерживается только Debian 12/13${RESET}"
         sleep 5
         continue
     fi
-
     PKG="zabbix-release_latest_${ZVER}+debian${VER}_all.deb"
     URL="https://repo.zabbix.com/zabbix/${ZVER}/debian/pool/main/z/zabbix-release/${PKG}"
-
     wget -q "$URL" && dpkg -i "$PKG"
     apt update
     apt install -y zabbix-agent
-
     sed -i "s/^Server=.*/Server=${SERVER}/" /etc/zabbix/zabbix_agentd.conf
     sed -i "s/^ServerActive=.*/ServerActive=${SERVER}/" /etc/zabbix/zabbix_agentd.conf
     sed -i "s/^Hostname=.*/Hostname=${HOST}/" /etc/zabbix/zabbix_agentd.conf
-
     systemctl restart zabbix-agent
     systemctl enable zabbix-agent
     echo -e "${GREEN}Zabbix установлен${RESET}"
