@@ -18,31 +18,26 @@ if [[ $EUID -ne 0 ]]; then
     echo -e "${RED}Скрипт должен быть запущен от root${RESET}"
     exit 1
 fi
-
-### Информация о системе при запуске
-DISTRO=$(grep '^PRETTY_NAME=' /etc/os-release | cut -d= -f2 | tr -d '"')
-HOST=$(hostname)
-IP=$(hostname -I | awk '{print $1}')
-LOAD=$(uptime | awk -F'load average:' '{print $2}' | sed 's/^ //')
-MEM_TOTAL=$(grep MemTotal /proc/meminfo | awk '{printf "%.0f\n", $2/1024}')
-MEM_FREE=$(grep MemAvailable /proc/meminfo | awk '{printf "%.0f\n", $2/1024}')
-MEM_USED=$((MEM_TOTAL - MEM_FREE))
-MEM_PERC=$(( MEM_USED * 100 / MEM_TOTAL ))
-
-clear
-echo -e "${BLUE}============================================================${RESET}"
-echo -e "${GREEN}   SYSTEM INFORMATION${RESET}"
-echo -e "${BLUE}============================================================${RESET}"
-echo -e "${YELLOW}Distro:           ${RESET}${DISTRO}"
-echo -e "${YELLOW}Hostname:         ${RESET}${HOST}"
-echo -e "${YELLOW}IP:               ${RESET}${IP}"
-echo -e "${YELLOW}Load average:     ${RESET}${LOAD}"
-echo -e "${YELLOW}RAM:              ${RESET}${MEM_USED}MB / ${MEM_TOTAL}MB (${MEM_PERC}%)"
-echo -e "${BLUE}============================================================${RESET}"
-sleep 3
-
 ### Меню
 while true; do
+    ### Информация о системе при запуске
+    DISTRO=$(grep '^PRETTY_NAME=' /etc/os-release | cut -d= -f2 | tr -d '"')
+    HOST=$(hostname)
+    IP=$(hostname -I | awk '{print $1}')
+    LOAD=$(uptime | awk -F'load average:' '{print $2}' | sed 's/^ //')
+    MEM_TOTAL=$(grep MemTotal /proc/meminfo | awk '{printf "%.0f\n", $2/1024}')
+    MEM_FREE=$(grep MemAvailable /proc/meminfo | awk '{printf "%.0f\n", $2/1024}')
+    MEM_USED=$((MEM_TOTAL - MEM_FREE))
+    MEM_PERC=$(( MEM_USED * 100 / MEM_TOTAL ))
+    echo -e "${BLUE}============================================================${RESET}"
+    echo -e "${GREEN}   SYSTEM INFORMATION${RESET}"
+    echo -e "${BLUE}============================================================${RESET}"
+    echo -e "${YELLOW}Distro:           ${RESET}${DISTRO}"
+    echo -e "${YELLOW}Hostname:         ${RESET}${HOST}"
+    echo -e "${YELLOW}IP:               ${RESET}${IP}"
+    echo -e "${YELLOW}Load average:     ${RESET}${LOAD}"
+    echo -e "${YELLOW}RAM:              ${RESET}${MEM_USED}MB / ${MEM_TOTAL}MB (${MEM_PERC}%)"
+    echo -e "${BLUE}============================================================${RESET}"
     echo ""
     echo -e "${GREEN}Выберите этап:${RESET}"
     echo -e "${YELLOW}1${RESET} - Первичная настройка"
