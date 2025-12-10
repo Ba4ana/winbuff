@@ -5,7 +5,7 @@ $ErrorActionPreference = 'SilentlyContinue'
 $ProgressPreference = 'SilentlyContinue'
 
 # Определение переменных
-$ver = "0054"
+$vers = "0.6.0"
 $name = "_winbuff"
 $main = "$env:SystemRoot\$name"
 $logs = "$main\log"
@@ -16,7 +16,7 @@ $host.ui.rawui.WindowTitle = "Подготовка системы"
 
 # Вывод начального сообщения
 write-host "================================================================"
-write-host "[                Я утилита оптимизации системы v.$ver          ]"
+write-host "[                Я утилита оптимизации системы v.$vers         ]"
 write-host "[          Нужна для того чтобы ускорить и обезопасить         ]"
 write-host "[                   работу вашего зверька                      ]"
 write-host "[                                                              ]"

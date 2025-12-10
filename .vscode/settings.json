@@ -13,5 +13,6 @@
     "sonarlint.connectedMode.project": {
         "connectionId": "ba4ana",
         "projectKey": "Ba4ana_winbuff"
-    }
+    },
+    "codeQL.githubDatabase.update": "never"
 }
