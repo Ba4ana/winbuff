@@ -31,7 +31,7 @@ def warn_and_pause(msg, seconds=10):
 
 
 def main():
-    ver = "055"
+    vers = "0.6.0"
     name = "_winbuff"
     main = os.path.join(r"C:\Windows", name)
     logs = os.path.join(main, "log")
@@ -42,7 +42,7 @@ def main():
 
     steps = [
         (setup_console, ()),
-        (print_info, (ver, name)),
+        (print_info, (vers, name)),
         (setup_7zip, (adms,)),
         (download_and_extract, (name, temp)),
         (copy_files, (temp, main, adms, name)),
@@ -67,9 +67,9 @@ def setup_console():
     os.system('title Подготовка системы')
     os.system('cls')
 
-def print_info(ver, name):
+def print_info(vers, name):
     print("=" * 64)
-    print (f"[                Я утилита оптимизации системы v.{ver}          ]")
+    print (f"[                Я утилита оптимизации системы v.{vers}         ]")
     print ("[          Нужна для того чтобы ускорить и обезопасить         ]")
     print ("[                   работу вашего зверька                      ]")
     print ("[                                                              ]")
