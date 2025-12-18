@@ -18,6 +18,7 @@ if [[ $EUID -ne 0 ]]; then
     echo -e "${RED}Скрипт должен быть запущен от root${RESET}"
     exit 1
 fi
+
 ### Меню
 while true; do
     ### Информация о системе при запуске

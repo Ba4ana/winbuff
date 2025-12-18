@@ -12,6 +12,20 @@ $logs = "$main\log"
 $temp = "$main\temp"
 $adms = "C:\Admins\add"
 
+function New-Directory {
+    param ([string]$Path)
+    if (-not (Test-Path $Path)) {
+        New-Item -Path $Path -ItemType Directory | Out-Null
+        Write-Host "Создан каталог: $Path"
+    }
+}
+
+New-Directory $main
+New-Directory $logs
+New-Directory $temp
+New-Directory $adms
+Set-Location $main
+
 $host.ui.rawui.WindowTitle = "Подготовка системы"
 
 # Вывод начального сообщения
@@ -45,15 +59,6 @@ $brandmauer = get-netfirewallrule -displayname "$name"
 if (!$brandmauer) {
     new-netfirewallrule -displayname "$name" -action allow -program "$main\$name.ps1"
 }
-
-# Проверка и создание каталогов
-$directories = @($main, $logs, $temp, $adms)
-foreach ($dir in $directories) {
-    if (!(test-path $dir)) { new-item -path $dir -itemtype directory -force }
-}
-
-# Переход в каталог
-Set-Location $main
 
 ## Установка 7-Zip
 # Версия 7-Zip
