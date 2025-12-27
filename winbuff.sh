@@ -7,12 +7,6 @@ YELLOW="\e[33m"
 BLUE="\e[34m"
 RESET="\e[0m"
 
-### Проверка на Debian
-#if ! grep -q '^ID=debian' /etc/os-release ; then
-#    echo -e "${RED}Этот скрипт работает только на Debian 12/13${RESET}"
-#    exit 1
-#fi
-
 ### Проверка root
 if [[ $EUID -ne 0 ]]; then
     echo -e "${RED}Скрипт должен быть запущен от root${RESET}"
@@ -30,6 +24,7 @@ while true; do
     MEM_FREE=$(grep MemAvailable /proc/meminfo | awk '{printf "%.0f\n", $2/1024}')
     MEM_USED=$((MEM_TOTAL - MEM_FREE))
     MEM_PERC=$(( MEM_USED * 100 / MEM_TOTAL ))
+
     echo -e "${BLUE}============================================================${RESET}"
     echo -e "${GREEN}   SYSTEM INFORMATION${RESET}"
     echo -e "${BLUE}============================================================${RESET}"
@@ -41,15 +36,16 @@ while true; do
     echo -e "${BLUE}============================================================${RESET}"
     echo ""
     echo -e "${GREEN}Выберите этап:${RESET}"
-    echo -e "${YELLOW}1${RESET} - Первичная настройка"
-    echo -e "${YELLOW}2${RESET} - Установка обновлений"
-    echo -e "${YELLOW}3${RESET} - Настройка автообновления"
-    echo -e "${YELLOW}4${RESET} - Удаление автообновления"
-    echo -e "${YELLOW}5${RESET} - Установка Zabbix"
-    echo -e "${YELLOW}6${RESET} - Настройка eth0"
-    echo -e "${YELLOW}9${RESET} - SFTP root"
+    echo -e "${YELLOW}1${RESET}  - Первичная настройка"
+    echo -e "${YELLOW}2${RESET}  - Установка обновлений"
+    echo -e "${YELLOW}3${RESET}  - Настройка автообновления"
+    echo -e "${YELLOW}4${RESET}  - Удаление автообновления"
+    echo -e "${YELLOW}5${RESET}  - Установка Zabbix"
+    echo -e "${YELLOW}6${RESET}  - Настройка eth0"
+    echo -e "${YELLOW}8${RESET}  - Создать пользователя tech"
+    echo -e "${YELLOW}9${RESET}  - SFTP root"
     echo -e "${YELLOW}10${RESET} - Очистить историю"
-    echo -e "${YELLOW}0${RESET} - Выход"
+    echo -e "${YELLOW}0${RESET}  - Выход"
     read -p "Введите номер: " stage
 
 ###################### 1 ######################
@@ -83,9 +79,12 @@ EOF
     sysctl --system
 
     echo -e "${BLUE}Настройка sudo для tech...${RESET}"
-    if ! grep -q '^tech\s\+ALL=' /etc/sudoers ; then
-        echo "tech    ALL=(ALL)    NOPASSWD:ALL" >> /etc/sudoers
+    if id tech &>/dev/null; then
+        if ! grep -q '^tech\s\+ALL=' /etc/sudoers ; then
+            echo "tech    ALL=(ALL)    NOPASSWD:ALL" >> /etc/sudoers
+        fi
     fi
+
     echo -e "${GREEN}Этап 1 завершен!${RESET}"
 
 ###################### 2 ######################
@@ -171,6 +170,33 @@ EOF
 
     systemctl restart networking
     echo -e "${GREEN}Готово. Требуется перезагрузка.${RESET}"
+
+###################### 8 ######################
+elif [[ "$stage" == "8" ]]; then
+    echo -e "${BLUE}Создание пользователя tech...${RESET}"
+
+    if id tech &>/dev/null; then
+        echo -e "${YELLOW}Пользователь tech уже существует${RESET}"
+    else
+        useradd -m -s /bin/bash tech
+        echo -e "${GREEN}Пользователь tech создан${RESET}"
+    fi
+
+    echo -e "${BLUE}Задайте пароль для tech:${RESET}"
+    passwd tech
+
+    if ! id tech &>/dev/null; then
+        echo -e "${RED}Ошибка создания пользователя${RESET}"
+        continue
+    fi
+
+    usermod -aG sudo tech
+
+    if ! grep -q '^tech\s\+ALL=' /etc/sudoers ; then
+        echo "tech    ALL=(ALL)    NOPASSWD:ALL" >> /etc/sudoers
+    fi
+
+    echo -e "${GREEN}Пользователь tech готов и добавлен в sudo${RESET}"
 
 ###################### 9 ######################
 elif [[ "$stage" == "9" ]]; then
