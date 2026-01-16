@@ -42,6 +42,7 @@ while true; do
     echo -e "${YELLOW}4${RESET}  - Удаление автообновления"
     echo -e "${YELLOW}5${RESET}  - Установка Zabbix"
     echo -e "${YELLOW}6${RESET}  - Настройка eth0"
+    echo -e "${YELLOW}7${RESET}  - Обновление Debian 12 -> 13 (автоматически)"
     echo -e "${YELLOW}8${RESET}  - Создать пользователя tech"
     echo -e "${YELLOW}9${RESET}  - SFTP root"
     echo -e "${YELLOW}10${RESET} - Очистить историю"
@@ -170,6 +171,53 @@ EOF
 
     systemctl restart networking
     echo -e "${GREEN}Готово. Требуется перезагрузка.${RESET}"
+
+###################### 7 ######################
+elif [[ "$stage" == "7" ]]; then
+    VER=$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '"')
+    if [[ "$VER" != "12" ]]; then
+        echo -e "${RED}Этот этап предназначен только для Debian 12. Текущая версия: ${VER}${RESET}"
+        sleep 5
+        continue
+    fi
+
+    echo -e "${BLUE}Подготовка: обновляем Debian 12 до актуального состояния...${RESET}"
+    export DEBIAN_FRONTEND=noninteractive
+    apt update
+    apt -y upgrade
+    apt -y full-upgrade
+    apt -y autoremove
+    apt -y clean
+
+    echo -e "${BLUE}Отключаем сторонние репозитории (если есть) и готовим sources.list...${RESET}"
+    mkdir -p /root/upgrade-backup
+    cp -a /etc/apt/sources.list /root/upgrade-backup/sources.list.$(date +%F_%H%M%S)
+
+    if [ -d /etc/apt/sources.list.d ]; then
+        tar -czf /root/upgrade-backup/sources.list.d.$(date +%F_%H%M%S).tgz /etc/apt/sources.list.d 2>/dev/null || true
+    fi
+
+    if [ -d /etc/apt/sources.list.d ]; then
+        find /etc/apt/sources.list.d -maxdepth 1 -type f -name "*.list" -exec mv -f {} {}.disabled \; 2>/dev/null || true
+    fi
+
+    sed -i 's/bookworm/trixie/g' /etc/apt/sources.list
+    sed -i 's/Bookworm/Trixie/g' /etc/apt/sources.list
+    sed -i '/^deb cdrom:/d' /etc/apt/sources.list
+
+    echo -e "${BLUE}Обновляем списки пакетов для Debian 13 (trixie)...${RESET}"
+    apt update
+
+    echo -e "${BLUE}Выполняем dist-upgrade (full-upgrade) до Debian 13...${RESET}"
+    apt -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" full-upgrade
+
+    echo -e "${BLUE}Чистим систему...${RESET}"
+    apt -y autoremove
+    apt -y clean
+
+    NEWVER=$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '"')
+    echo -e "${GREEN}Обновление завершено. Текущая версия Debian: ${NEWVER}${RESET}"
+    echo -e "${YELLOW}Рекомендуется перезагрузка.${RESET}"
 
 ###################### 8 ######################
 elif [[ "$stage" == "8" ]]; then
