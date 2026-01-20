@@ -55,7 +55,7 @@ if [[ "$stage" == "1" ]]; then
     sed -i '/^deb cdrom:/d' /etc/apt/sources.list
     apt update && apt-get update
     apt-get autoremove -y && apt-get clean -y
-    apt-get install -y sudo curl socat git wget lnav htop mc whois gnupg2 ncdu console-cyrillic
+    apt-get install -y sudo curl socat git wget lnav btop mc whois gnupg2 ncdu console-cyrillic
 
     echo -e "${BLUE}Настройка истории...${RESET}"
     for USER_HOME in /root /home/tech; do
@@ -67,7 +67,7 @@ if [[ "$stage" == "1" ]]; then
             grep -qx 'export HISTSIZE=1999' $USER_HOME/.bash_profile || echo 'export HISTSIZE=1999' >> $USER_HOME/.bash_profile
             grep -qx 'export HISTFILESIZE=1999' $USER_HOME/.bash_profile || echo 'export HISTFILESIZE=1999' >> $USER_HOME/.bash_profile
             grep -qx 'export HISTCONTROL=ignoreboth:erasedups' $USER_HOME/.bash_profile || echo 'export HISTCONTROL=ignoreboth:erasedups' >> $USER_HOME/.bash_profile
-            grep -Fxq "export HISTIGNORE='shutdown:reboot:history*:exit:ls:mc:htop:apt*'" $USER_HOME/.bash_profile || echo "export HISTIGNORE='shutdown:reboot:history*:exit:ls:mc:htop:apt*'" >> $USER_HOME/.bash_profile
+            grep -Fxq "export HISTIGNORE='shutdown:reboot:history*:exit:ls:mc:htop:btop:apt*'" $USER_HOME/.bash_profile || echo "export HISTIGNORE='shutdown:reboot:history*:exit:ls:mc:htop:apt*'" >> $USER_HOME/.bash_profile
             grep -qx "PROMPT_COMMAND='history -a'" $USER_HOME/.bash_profile || echo "PROMPT_COMMAND='history -a'" >> $USER_HOME/.bash_profile
         fi
     done
