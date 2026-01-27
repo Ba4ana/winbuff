@@ -1,10 +1,10 @@
-# Конфигурация внешнего вида и настроек PowerShell
+п»ї# РљРѕРЅС„РёРіСѓСЂР°С†РёСЏ РІРЅРµС€РЅРµРіРѕ РІРёРґР° Рё РЅР°СЃС‚СЂРѕРµРє PowerShell
 $host.ui.RawUI.ForegroundColor = "green"
 $host.ui.RawUI.BackgroundColor = "black"
 $ErrorActionPreference = 'SilentlyContinue'
 $ProgressPreference = 'SilentlyContinue'
 
-# Определение переменных
+# РћРїСЂРµРґРµР»РµРЅРёРµ РїРµСЂРµРјРµРЅРЅС‹С…
 $vers = "0.6.0"
 $name = "_winbuff"
 $main = "$env:SystemRoot\$name"
@@ -16,7 +16,7 @@ function New-Directory {
     param ([string]$Path)
     if (-not (Test-Path $Path)) {
         New-Item -Path $Path -ItemType Directory | Out-Null
-        Write-Host "Создан каталог: $Path"
+        Write-Host "РЎРѕР·РґР°РЅ РєР°С‚Р°Р»РѕРі: $Path"
     }
 }
 
@@ -26,52 +26,52 @@ New-Directory $temp
 New-Directory $adms
 Set-Location $main
 
-$host.ui.rawui.WindowTitle = "Подготовка системы"
+$host.ui.rawui.WindowTitle = "РџРѕРґРіРѕС‚РѕРІРєР° СЃРёСЃС‚РµРјС‹"
 
-# Вывод начального сообщения
+# Р’С‹РІРѕРґ РЅР°С‡Р°Р»СЊРЅРѕРіРѕ СЃРѕРѕР±С‰РµРЅРёСЏ
 write-host "================================================================"
-write-host "[                Я утилита оптимизации системы v.$vers         ]"
-write-host "[          Нужна для того чтобы ускорить и обезопасить         ]"
-write-host "[                   работу вашего зверька                      ]"
+write-host "[                РЇ СѓС‚РёР»РёС‚Р° РѕРїС‚РёРјРёР·Р°С†РёРё СЃРёСЃС‚РµРјС‹ v.$vers         ]"
+write-host "[          РќСѓР¶РЅР° РґР»СЏ С‚РѕРіРѕ С‡С‚РѕР±С‹ СѓСЃРєРѕСЂРёС‚СЊ Рё РѕР±РµР·РѕРїР°СЃРёС‚СЊ         ]"
+write-host "[                   СЂР°Р±РѕС‚Сѓ РІР°С€РµРіРѕ Р·РІРµСЂСЊРєР°                      ]"
 write-host "[                                                              ]"
 write-host "[                                                              ]"
-write-host "[            Постоянно  совершенствуюсь и познаю новое         ]"
-write-host "[      Перед тем как работать я создаю точку восстановления    ]"
-write-host "[              поэтому все действия можно отменить             ]"
+write-host "[            РџРѕСЃС‚РѕСЏРЅРЅРѕ  СЃРѕРІРµСЂС€РµРЅСЃС‚РІСѓСЋСЃСЊ Рё РїРѕР·РЅР°СЋ РЅРѕРІРѕРµ         ]"
+write-host "[      РџРµСЂРµРґ С‚РµРј РєР°Рє СЂР°Р±РѕС‚Р°С‚СЊ СЏ СЃРѕР·РґР°СЋ С‚РѕС‡РєСѓ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ    ]"
+write-host "[              РїРѕСЌС‚РѕРјСѓ РІСЃРµ РґРµР№СЃС‚РІРёСЏ РјРѕР¶РЅРѕ РѕС‚РјРµРЅРёС‚СЊ             ]"
 write-host "[                                                              ]"
 write-host "[                                                              ]"
-write-host "[               Информацию об мне можно узнать                 ]"
-write-host "[             у вашего системного администратора               ]"
+write-host "[               РРЅС„РѕСЂРјР°С†РёСЋ РѕР± РјРЅРµ РјРѕР¶РЅРѕ СѓР·РЅР°С‚СЊ                 ]"
+write-host "[             Сѓ РІР°С€РµРіРѕ СЃРёСЃС‚РµРјРЅРѕРіРѕ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР°               ]"
 write-host "[                                                              ]"
 write-host "[                                                              ]"
-write-host "[        Чтобы я прекратила работу  закройте окно или          ]"
-write-host "[    Нажмите кнопку [ Х ] в правом верхнем углу этого окна     ]"
-write-host "[                        Продолжим?                            ]"
+write-host "[        Р§С‚РѕР±С‹ СЏ РїСЂРµРєСЂР°С‚РёР»Р° СЂР°Р±РѕС‚Сѓ  Р·Р°РєСЂРѕР№С‚Рµ РѕРєРЅРѕ РёР»Рё          ]"
+write-host "[    РќР°Р¶РјРёС‚Рµ РєРЅРѕРїРєСѓ [ РҐ ] РІ РїСЂР°РІРѕРј РІРµСЂС…РЅРµРј СѓРіР»Сѓ СЌС‚РѕРіРѕ РѕРєРЅР°     ]"
+write-host "[                        РџСЂРѕРґРѕР»Р¶РёРј?                            ]"
 write-host "================================================================"
 
-# Отключение защиты PowerShell
+# РћС‚РєР»СЋС‡РµРЅРёРµ Р·Р°С‰РёС‚С‹ PowerShell
 set-executionpolicy -scope process -executionpolicy bypass -force
 set-executionpolicy -scope currentuser -executionpolicy bypass -force
 set-executionpolicy -scope localmachine -executionpolicy bypass -force
 
-# Конфигурация брандмауэра
+# РљРѕРЅС„РёРіСѓСЂР°С†РёСЏ Р±СЂР°РЅРґРјР°СѓСЌСЂР°
 $brandmauer = get-netfirewallrule -displayname "$name"
 if (!$brandmauer) {
     new-netfirewallrule -displayname "$name" -action allow -program "$main\$name.ps1"
 }
 
-## Установка 7-Zip
-# Версия 7-Zip
+## РЈСЃС‚Р°РЅРѕРІРєР° 7-Zip
+# Р’РµСЂСЃРёСЏ 7-Zip
 $sevenZipDisplayVersion = "25.01"
 $sevenZipDownloadVersion = "2501"
 
-# Определяем архитектуру ОС и соответствующий файл установщика
+# РћРїСЂРµРґРµР»СЏРµРј Р°СЂС…РёС‚РµРєС‚СѓСЂСѓ РћРЎ Рё СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёР№ С„Р°Р№Р» СѓСЃС‚Р°РЅРѕРІС‰РёРєР°
 $osArchitecture = (Get-WmiObject win32_operatingsystem).osarchitecture
 $sevenZipInstaller = if ($osArchitecture -like "64*") { "7z$sevenZipDownloadVersion-x64.exe" } else { "7z$sevenZipDownloadVersion.exe" }
 $sevenZipInstallPath = "$adms\7zip\$sevenZipInstaller"
 $sevenZipExePath = "C:\Program Files\7-Zip\7z.exe"
 
-# Функция для получения версии 7-Zip
+# Р¤СѓРЅРєС†РёСЏ РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ РІРµСЂСЃРёРё 7-Zip
 function Get-7ZipVersion {
     if (Test-Path $sevenZipExePath) {
         $output = & "$sevenZipExePath" | Select-String -Pattern "7-Zip \d+\.\d+"
@@ -83,7 +83,7 @@ function Get-7ZipVersion {
     return $null
 }
 
-# Функция для проверки наличия интернет-соединения
+# Р¤СѓРЅРєС†РёСЏ РґР»СЏ РїСЂРѕРІРµСЂРєРё РЅР°Р»РёС‡РёСЏ РёРЅС‚РµСЂРЅРµС‚-СЃРѕРµРґРёРЅРµРЅРёСЏ
 function Test-InternetConnection {
     try {
         Test-Connection -ComputerName "8.8.8.8" -Count 1 -Quiet -ErrorAction Stop
@@ -93,72 +93,72 @@ function Test-InternetConnection {
     }
 }
 
-# Проверяем, установлен ли 7-Zip, и получаем его версию
+# РџСЂРѕРІРµСЂСЏРµРј, СѓСЃС‚Р°РЅРѕРІР»РµРЅ Р»Рё 7-Zip, Рё РїРѕР»СѓС‡Р°РµРј РµРіРѕ РІРµСЂСЃРёСЋ
 if (Test-Path $sevenZipExePath) {
     $installedVersion = Get-7ZipVersion
     if ($installedVersion) {
-        Write-Host "Установленная версия 7-Zip: $installedVersion"
+        Write-Host "РЈСЃС‚Р°РЅРѕРІР»РµРЅРЅР°СЏ РІРµСЂСЃРёСЏ 7-Zip: $installedVersion"
     } else {
-        Write-Host "Не удалось определить версию установленного 7-Zip." -ForegroundColor Yellow
+        Write-Host "РќРµ СѓРґР°Р»РѕСЃСЊ РѕРїСЂРµРґРµР»РёС‚СЊ РІРµСЂСЃРёСЋ СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅРѕРіРѕ 7-Zip." -ForegroundColor Yellow
     }
 
     if ($installedVersion -eq $sevenZipDisplayVersion) {
-        Write-Host "7-Zip версии $sevenZipDisplayVersion уже установлен. Пропускаем установку." -ForegroundColor Green
+        Write-Host "7-Zip РІРµСЂСЃРёРё $sevenZipDisplayVersion СѓР¶Рµ СѓСЃС‚Р°РЅРѕРІР»РµРЅ. РџСЂРѕРїСѓСЃРєР°РµРј СѓСЃС‚Р°РЅРѕРІРєСѓ." -ForegroundColor Green
     } else {
         if (Test-InternetConnection) {
             if (!(Test-Path $sevenZipInstallPath)) {
-                Write-Host "Загрузка 7-Zip версии $sevenZipDisplayVersion..."
+                Write-Host "Р—Р°РіСЂСѓР·РєР° 7-Zip РІРµСЂСЃРёРё $sevenZipDisplayVersion..."
                 if (!(Test-Path "$adms\7zip")) { New-Item -Path "$adms\7zip" -ItemType Directory -Force }
                 $client = New-Object System.Net.WebClient
                 $downloadLink = "https://www.7-zip.org/a/$sevenZipInstaller"
 
                 try {
                     $client.DownloadFile($downloadLink, $sevenZipInstallPath)
-                    Write-Host "Файл $sevenZipInstaller успешно скачан."
+                    Write-Host "Р¤Р°Р№Р» $sevenZipInstaller СѓСЃРїРµС€РЅРѕ СЃРєР°С‡Р°РЅ."
                 } catch {
-                    Write-Host "Ошибка при скачивании файла $sevenZipInstaller" -ForegroundColor Red
+                    Write-Host "РћС€РёР±РєР° РїСЂРё СЃРєР°С‡РёРІР°РЅРёРё С„Р°Р№Р»Р° $sevenZipInstaller" -ForegroundColor Red
                 }
             }
 
             if (Test-Path $sevenZipInstallPath) {
-                Write-Host "Установка 7-Zip версии $sevenZipDisplayVersion..."
+                Write-Host "РЈСЃС‚Р°РЅРѕРІРєР° 7-Zip РІРµСЂСЃРёРё $sevenZipDisplayVersion..."
                 Start-Process -FilePath $sevenZipInstallPath -ArgumentList "/S" -Wait
             } else {
-                Write-Host "Файл установщика не найден. Установка пропущена." -ForegroundColor Yellow
+                Write-Host "Р¤Р°Р№Р» СѓСЃС‚Р°РЅРѕРІС‰РёРєР° РЅРµ РЅР°Р№РґРµРЅ. РЈСЃС‚Р°РЅРѕРІРєР° РїСЂРѕРїСѓС‰РµРЅР°." -ForegroundColor Yellow
             }
         } else {
-            Write-Host "Интернет-соединение отсутствует. Пропускаем скачивание 7-Zip." -ForegroundColor Yellow
+            Write-Host "РРЅС‚РµСЂРЅРµС‚-СЃРѕРµРґРёРЅРµРЅРёРµ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚. РџСЂРѕРїСѓСЃРєР°РµРј СЃРєР°С‡РёРІР°РЅРёРµ 7-Zip." -ForegroundColor Yellow
         }
     }
 } else {
-    Write-Host "7-Zip не установлен. Начинаем установку."
+    Write-Host "7-Zip РЅРµ СѓСЃС‚Р°РЅРѕРІР»РµРЅ. РќР°С‡РёРЅР°РµРј СѓСЃС‚Р°РЅРѕРІРєСѓ."
     if (Test-InternetConnection) {
         if (!(Test-Path $sevenZipInstallPath)) {
-            Write-Host "Загрузка 7-Zip версии $sevenZipDisplayVersion..."
+            Write-Host "Р—Р°РіСЂСѓР·РєР° 7-Zip РІРµСЂСЃРёРё $sevenZipDisplayVersion..."
             if (!(Test-Path "$adms\7zip")) { New-Item -Path "$adms\7zip" -ItemType Directory -Force }
             $client = New-Object System.Net.WebClient
             $downloadLink = "https://www.7-zip.org/a/$sevenZipInstaller"
 
             try {
                 $client.DownloadFile($downloadLink, $sevenZipInstallPath)
-                Write-Host "Файл $sevenZipInstaller успешно скачан."
+                Write-Host "Р¤Р°Р№Р» $sevenZipInstaller СѓСЃРїРµС€РЅРѕ СЃРєР°С‡Р°РЅ."
             } catch {
-                Write-Host "Ошибка при скачивании файла $sevenZipInstaller" -ForegroundColor Red
+                Write-Host "РћС€РёР±РєР° РїСЂРё СЃРєР°С‡РёРІР°РЅРёРё С„Р°Р№Р»Р° $sevenZipInstaller" -ForegroundColor Red
             }
         }
 
         if (Test-Path $sevenZipInstallPath) {
-            Write-Host "Установка 7-Zip версии $sevenZipDisplayVersion..."
+            Write-Host "РЈСЃС‚Р°РЅРѕРІРєР° 7-Zip РІРµСЂСЃРёРё $sevenZipDisplayVersion..."
             Start-Process -FilePath $sevenZipInstallPath -ArgumentList "/S" -Wait
         } else {
-            Write-Host "Файл установщика не найден. Установка пропущена." -ForegroundColor Yellow
+            Write-Host "Р¤Р°Р№Р» СѓСЃС‚Р°РЅРѕРІС‰РёРєР° РЅРµ РЅР°Р№РґРµРЅ. РЈСЃС‚Р°РЅРѕРІРєР° РїСЂРѕРїСѓС‰РµРЅР°." -ForegroundColor Yellow
         }
     } else {
-        Write-Host "Интернет-соединение отсутствует. Пропускаем установку 7-Zip." -ForegroundColor Yellow
+        Write-Host "РРЅС‚РµСЂРЅРµС‚-СЃРѕРµРґРёРЅРµРЅРёРµ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚. РџСЂРѕРїСѓСЃРєР°РµРј СѓСЃС‚Р°РЅРѕРІРєСѓ 7-Zip." -ForegroundColor Yellow
     }
 }
 
-# Скачивание утилиты
+# РЎРєР°С‡РёРІР°РЅРёРµ СѓС‚РёР»РёС‚С‹
 $down_url = "ftp://winbuff.evrasia.spb.ru//$name.zip"
 $local_path = "$temp\$name.zip"
 $user = "u1206988_upd_win"
@@ -169,34 +169,34 @@ $webclient.Credentials = New-Object System.Net.NetworkCredential($user, $pass)
 $webclient.DownloadFile($down_url, $local_path)
 
 
-# Распаковка архива
+# Р Р°СЃРїР°РєРѕРІРєР° Р°СЂС…РёРІР°
 expand-archive -path $local_path -destinationpath $temp -force
 $test_call_success = $?
 if(-not $test_call_success)
 {
-    # Определите путь к вашему ZIP-архиву
+    # РћРїСЂРµРґРµР»РёС‚Рµ РїСѓС‚СЊ Рє РІР°С€РµРјСѓ ZIP-Р°СЂС…РёРІСѓ
     $zipPath = "$local_path"
-    # Определите путь, куда вы хотите извлечь файлы
+    # РћРїСЂРµРґРµР»РёС‚Рµ РїСѓС‚СЊ, РєСѓРґР° РІС‹ С…РѕС‚РёС‚Рµ РёР·РІР»РµС‡СЊ С„Р°Р№Р»С‹
     $extractPath = "$temp"
-    # Создайте объекты COM для работы с ZIP
+    # РЎРѕР·РґР°Р№С‚Рµ РѕР±СЉРµРєС‚С‹ COM РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ ZIP
     $shell = New-Object -ComObject Shell.Application
     $zip = $shell.NameSpace($zipPath)
     $destination = $shell.NameSpace($extractPath)
-    # Проверьте, что пути корректно определены
+    # РџСЂРѕРІРµСЂСЊС‚Рµ, С‡С‚Рѕ РїСѓС‚Рё РєРѕСЂСЂРµРєС‚РЅРѕ РѕРїСЂРµРґРµР»РµРЅС‹
     if ($null -eq $zip -or $null -eq $destination) {
         Write-Error "Invalid path"
         exit
     }
-    # Флаги для метода CopyHere
-    # 16 - Отменить диалоговое окно, показывающее ошибки копирования (например, если файл уже существует)
-    # 4 - Не отображать прогресс-бар
+    # Р¤Р»Р°РіРё РґР»СЏ РјРµС‚РѕРґР° CopyHere
+    # 16 - РћС‚РјРµРЅРёС‚СЊ РґРёР°Р»РѕРіРѕРІРѕРµ РѕРєРЅРѕ, РїРѕРєР°Р·С‹РІР°СЋС‰РµРµ РѕС€РёР±РєРё РєРѕРїРёСЂРѕРІР°РЅРёСЏ (РЅР°РїСЂРёРјРµСЂ, РµСЃР»Рё С„Р°Р№Р» СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚)
+    # 4 - РќРµ РѕС‚РѕР±СЂР°Р¶Р°С‚СЊ РїСЂРѕРіСЂРµСЃСЃ-Р±Р°СЂ
     # 20 = 16 + 4
     $copyOptions = 20
-    # Копируйте файлы из ZIP-архива
+    # РљРѕРїРёСЂСѓР№С‚Рµ С„Р°Р№Р»С‹ РёР· ZIP-Р°СЂС…РёРІР°
     $zip.Items() | ForEach-Object {
         $destination.CopyHere($_, $copyOptions)
     }
-    # Освободите ресурсы COM
+    # РћСЃРІРѕР±РѕРґРёС‚Рµ СЂРµСЃСѓСЂСЃС‹ COM
     [System.Runtime.Interopservices.Marshal]::ReleaseComObject($shell) | Out-Null
     [System.GC]::Collect()
     [System.GC]::WaitForPendingFinalizers()
@@ -204,24 +204,24 @@ if(-not $test_call_success)
 copy-item "$temp\$name.ps1" "$main" -force
 robocopy "$temp\add" "$adms" /MIR /Z /XO /R:0 /W:5
 
-# Настройка авто-запуска
+# РќР°СЃС‚СЂРѕР№РєР° Р°РІС‚Рѕ-Р·Р°РїСѓСЃРєР°
 $task_name = get-scheduledtask $name | get-scheduledtaskinfo
 if (!$task_name) {
     schtasks /create /tn "$name" /xml "$temp\$name.xml" /f
 }
 
-# Удаление существующей конфигурации, которая может мешать запуску .ps1 файлов.
+# РЈРґР°Р»РµРЅРёРµ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµР№ РєРѕРЅС„РёРіСѓСЂР°С†РёРё, РєРѕС‚РѕСЂР°СЏ РјРѕР¶РµС‚ РјРµС€Р°С‚СЊ Р·Р°РїСѓСЃРєСѓ .ps1 С„Р°Р№Р»РѕРІ.
 remove-item -path "Registry::HKEY_CLASSES_ROOT\Microsoft.PowerShellScript.1\Shell\0" -force -recurse -erroraction ignore
-# Добавление параметра 'HasLUAShield' в меню "Запуск от имени администратора" для .ps1 файлов.
+# Р”РѕР±Р°РІР»РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР° 'HasLUAShield' РІ РјРµРЅСЋ "Р—Р°РїСѓСЃРє РѕС‚ РёРјРµРЅРё Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР°" РґР»СЏ .ps1 С„Р°Р№Р»РѕРІ.
 reg add "HKEY_CLASSES_ROOT\SystemFileAssociations\.ps1\Shell\runas" /v HasLUAShield /t reg_sz /f
-# Настройка команды запуска PowerShell-скриптов от имени администратора (runas) в меню правой кнопки.
+# РќР°СЃС‚СЂРѕР№РєР° РєРѕРјР°РЅРґС‹ Р·Р°РїСѓСЃРєР° PowerShell-СЃРєСЂРёРїС‚РѕРІ РѕС‚ РёРјРµРЅРё Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР° (runas) РІ РјРµРЅСЋ РїСЂР°РІРѕР№ РєРЅРѕРїРєРё.
 reg add "HKEY_CLASSES_ROOT\SystemFileAssociations\.ps1\Shell\runas\command" /ve /t reg_sz /d 'c:\windows\system32\windowspowershell\v1.0\powershell.exe ""%1""' /f
-# Установка команды по умолчанию для открытия PowerShell-скриптов в текущем сеансе пользователя.
+# РЈСЃС‚Р°РЅРѕРІРєР° РєРѕРјР°РЅРґС‹ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ РґР»СЏ РѕС‚РєСЂС‹С‚РёСЏ PowerShell-СЃРєСЂРёРїС‚РѕРІ РІ С‚РµРєСѓС‰РµРј СЃРµР°РЅСЃРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ.
 reg add "HKEY_CURRENT_USER\Software\Classes\Applications\powershell.exe\shell\open\command" /ve /t reg_sz /d 'c:\windows\system32\windowspowershell\v1.0\powershell.exe ""%1""' /f
-# Установка команды для открытия .ps1 файлов в текущем сеансе пользователя.
+# РЈСЃС‚Р°РЅРѕРІРєР° РєРѕРјР°РЅРґС‹ РґР»СЏ РѕС‚РєСЂС‹С‚РёСЏ .ps1 С„Р°Р№Р»РѕРІ РІ С‚РµРєСѓС‰РµРј СЃРµР°РЅСЃРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ.
 reg add "HKEY_CURRENT_USER\Software\Classes\.ps1\shell\open\command" /ve /t reg_sz /d 'c:\windows\system32\windowspowershell\v1.0\powershell.exe ""%1""' /f
 
-# Переход к запуску второй части скрипта
+# РџРµСЂРµС…РѕРґ Рє Р·Р°РїСѓСЃРєСѓ РІС‚РѕСЂРѕР№ С‡Р°СЃС‚Рё СЃРєСЂРёРїС‚Р°
 Set-Location $temp
 .\loging.ps1
-#read-host -prompt "Для продолжения нажми Enter"
+#read-host -prompt "Р”Р»СЏ РїСЂРѕРґРѕР»Р¶РµРЅРёСЏ РЅР°Р¶РјРё Enter"

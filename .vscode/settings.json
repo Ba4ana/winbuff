@@ -9,10 +9,5 @@
     "python.testing.pytestEnabled": false,
     "python.testing.unittestEnabled": true,
     "files.encoding": "utf8",
-    "files.autoGuessEncoding": true,
-    "sonarlint.connectedMode.project": {
-        "connectionId": "ba4ana",
-        "projectKey": "Ba4ana_winbuff"
-    },
-    "codeQL.githubDatabase.update": "never"
+    "files.autoGuessEncoding": true
 }

@@ -1,4 +1,4 @@
-#!/bin/bash
+﻿#!/bin/bash
 
 ### Цвета
 RED="\e[31m"
