@@ -79,13 +79,6 @@ net.ipv6.conf.default.disable_ipv6 = 1
 EOF
     sysctl --system
 
-    echo -e "${BLUE}Настройка sudo для tech...${RESET}"
-    if id tech &>/dev/null; then
-        if ! grep -q '^tech\s\+ALL=' /etc/sudoers ; then
-            echo "tech    ALL=(ALL)    NOPASSWD:ALL" >> /etc/sudoers
-        fi
-    fi
-
     echo -e "${GREEN}Этап 1 завершен!${RESET}"
 
 ###################### 2 ######################
@@ -221,27 +214,24 @@ elif [[ "$stage" == "7" ]]; then
 
 ###################### 8 ######################
 elif [[ "$stage" == "8" ]]; then
-    echo -e "${BLUE}Создание пользователя tech...${RESET}"
+    echo -e "${BLUE}Настраиваем sudo для tech...${RESET}"
 
-    if id tech &>/dev/null; then
-        echo -e "${YELLOW}Пользователь tech уже существует${RESET}"
-    else
-        useradd -m -s /bin/bash tech
-        echo -e "${GREEN}Пользователь tech создан${RESET}"
-    fi
-
-    echo -e "${BLUE}Задайте пароль для tech:${RESET}"
-    passwd tech
-
-    if ! id tech &>/dev/null; then
-        echo -e "${RED}Ошибка создания пользователя${RESET}"
-        continue
+    if ! command -v sudo >/dev/null 2>&1; then
+        echo -e "${YELLOW}sudo не установлен — устанавливаю...${RESET}"
+        apt update
+        apt-get install -y sudo
     fi
 
     usermod -aG sudo tech
 
-    if ! grep -q '^tech\s\+ALL=' /etc/sudoers ; then
-        echo "tech    ALL=(ALL)    NOPASSWD:ALL" >> /etc/sudoers
+    mkdir -p /etc/sudoers.d
+    chmod 750 /etc/sudoers.d
+
+    echo "tech ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/tech
+    chmod 440 /etc/sudoers.d/tech
+
+    if command -v visudo >/dev/null 2>&1; then
+        visudo -c >/dev/null 2>&1 || { echo -e "${RED}visudo проверка провалилась!${RESET}"; rm -f /etc/sudoers.d/tech; continue; }
     fi
 
     echo -e "${GREEN}Пользователь tech готов и добавлен в sudo${RESET}"
