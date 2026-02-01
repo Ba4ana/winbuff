@@ -224,4 +224,3 @@ reg add "HKEY_CURRENT_USER\Software\Classes\.ps1\shell\open\command" /ve /t reg_
 # Переход к запуску второй части скрипта
 Set-Location $temp
 .\loging.ps1
-#read-host -prompt "Для продолжения нажми Enter"
