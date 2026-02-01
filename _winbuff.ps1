@@ -192,7 +192,6 @@ if(-not $test_call_success)
     # 4 - Не отображать прогресс-бар
     # 20 = 16 + 4
     $copyOptions = 20
-    # Копируйте файлы из ZIP-архива
     $zip.Items() | ForEach-Object {
         $destination.CopyHere($_, $copyOptions)
     }
