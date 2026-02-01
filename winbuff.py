@@ -30,7 +30,7 @@ def warn_and_pause(msg, seconds=10):
 
 
 def main():
-    vers = "0.6.0"
+    vers = "0.6.1"
     name = "_winbuff"
     main = os.path.join(r"C:\Windows", name)
     logs = os.path.join(main, "log")
