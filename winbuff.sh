@@ -224,13 +224,6 @@ else
     echo -e "${YELLOW}Пользователь tech уже существует${RESET}"
 fi
 
-# Запрос пароля вручную (если пользователь уже есть)
-echo -e "${BLUE}Установите пароль для tech:${RESET}"
-passwd tech || { 
-    echo -e "${RED}Ошибка установки пароля!${RESET}"
-    exit 1
-}
-
 # Установка sudo если отсутствует
 if ! command -v sudo >/dev/null 2>&1; then
     echo -e "${YELLOW}sudo не установлен — устанавливаю...${RESET}"
@@ -238,26 +231,24 @@ if ! command -v sudo >/dev/null 2>&1; then
     apt install -y sudo
 fi
 
-# Добавляем в группу sudo
 usermod -aG sudo tech
 
-# Создаём правило sudo
 mkdir -p /etc/sudoers.d
 chmod 750 /etc/sudoers.d
 
 echo "tech ALL=(ALL) ALL" > /etc/sudoers.d/tech
 chmod 440 /etc/sudoers.d/tech
 
-# Проверка синтаксиса sudoers
 if command -v visudo >/dev/null 2>&1; then
-    visudo -c || { 
+    visudo -c || {
         echo -e "${RED}visudo проверка провалилась!${RESET}"
         rm -f /etc/sudoers.d/tech
         exit 1
     }
 fi
 
-echo -e "${GREEN}Пользователь tech создан, пароль установлен и добавлен в sudo${RESET}"
+echo -e "${GREEN}Пользователь tech создан и добавлен в sudo${RESET}"
+
 
 
 ###################### 9 ######################
