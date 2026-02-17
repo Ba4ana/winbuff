@@ -214,27 +214,51 @@ elif [[ "$stage" == "7" ]]; then
 
 ###################### 8 ######################
 elif [[ "$stage" == "8" ]]; then
-    echo -e "${BLUE}Настраиваем sudo для tech...${RESET}"
+echo -e "${BLUE}Настраиваем пользователя tech...${RESET}"
 
-    if ! command -v sudo >/dev/null 2>&1; then
-        echo -e "${YELLOW}sudo не установлен — устанавливаю...${RESET}"
-        apt update
-        apt-get install -y sudo
-    fi
+# Создание пользователя если не существует
+if ! id "tech" >/dev/null 2>&1; then
+    echo -e "${YELLOW}Создаём пользователя tech...${RESET}"
+    adduser tech
+else
+    echo -e "${YELLOW}Пользователь tech уже существует${RESET}"
+fi
 
-    usermod -aG sudo tech
+# Запрос пароля вручную (если пользователь уже есть)
+echo -e "${BLUE}Установите пароль для tech:${RESET}"
+passwd tech || { 
+    echo -e "${RED}Ошибка установки пароля!${RESET}"
+    exit 1
+}
 
-    mkdir -p /etc/sudoers.d
-    chmod 750 /etc/sudoers.d
+# Установка sudo если отсутствует
+if ! command -v sudo >/dev/null 2>&1; then
+    echo -e "${YELLOW}sudo не установлен — устанавливаю...${RESET}"
+    apt update
+    apt install -y sudo
+fi
 
-    echo "tech ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/tech
-    chmod 440 /etc/sudoers.d/tech
+# Добавляем в группу sudo
+usermod -aG sudo tech
 
-    if command -v visudo >/dev/null 2>&1; then
-        visudo -c >/dev/null 2>&1 || { echo -e "${RED}visudo проверка провалилась!${RESET}"; rm -f /etc/sudoers.d/tech; continue; }
-    fi
+# Создаём правило sudo
+mkdir -p /etc/sudoers.d
+chmod 750 /etc/sudoers.d
 
-    echo -e "${GREEN}Пользователь tech готов и добавлен в sudo${RESET}"
+echo "tech ALL=(ALL) ALL" > /etc/sudoers.d/tech
+chmod 440 /etc/sudoers.d/tech
+
+# Проверка синтаксиса sudoers
+if command -v visudo >/dev/null 2>&1; then
+    visudo -c || { 
+        echo -e "${RED}visudo проверка провалилась!${RESET}"
+        rm -f /etc/sudoers.d/tech
+        exit 1
+    }
+fi
+
+echo -e "${GREEN}Пользователь tech создан, пароль установлен и добавлен в sudo${RESET}"
+
 
 ###################### 9 ######################
 elif [[ "$stage" == "9" ]]; then
