@@ -62,8 +62,8 @@ if (!$brandmauer) {
 
 ## Установка 7-Zip
 # Версия 7-Zip
-$sevenZipDisplayVersion = "25.01"
-$sevenZipDownloadVersion = "2501"
+$sevenZipDisplayVersion = "26.00"
+$sevenZipDownloadVersion = "2600"
 
 # Определяем архитектуру ОС и соответствующий файл установщика
 $osArchitecture = (Get-WmiObject win32_operatingsystem).osarchitecture
