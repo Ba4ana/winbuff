@@ -218,37 +218,36 @@ echo -e "${BLUE}Настраиваем пользователя tech...${RESET}"
 
 # Создание пользователя если не существует
 if ! id "tech" >/dev/null 2>&1; then
-    echo -e "${YELLOW}Создаём пользователя tech...${RESET}"
+    echo "Создаём пользователя tech..."
     adduser tech
 else
-    echo -e "${YELLOW}Пользователь tech уже существует${RESET}"
+    echo "Пользователь tech уже существует"
 fi
 
 # Установка sudo если отсутствует
 if ! command -v sudo >/dev/null 2>&1; then
-    echo -e "${YELLOW}sudo не установлен — устанавливаю...${RESET}"
+    echo "sudo не установлен — устанавливаю..."
     apt update
     apt install -y sudo
 fi
 
+# Добавляем в группу sudo
 usermod -aG sudo tech
 
-mkdir -p /etc/sudoers.d
-chmod 750 /etc/sudoers.d
-
+# Создаём файл sudoers
 echo "tech ALL=(ALL) ALL" > /etc/sudoers.d/tech
+
+# Правильные права
 chmod 440 /etc/sudoers.d/tech
 
-if command -v visudo >/dev/null 2>&1; then
-    visudo -c || {
-        echo -e "${RED}visudo проверка провалилась!${RESET}"
-        rm -f /etc/sudoers.d/tech
-        exit 1
-    }
-fi
+# Проверка
+visudo -c || {
+    echo "Ошибка в sudoers!"
+    rm -f /etc/sudoers.d/tech
+    exit 1
+}
 
-echo -e "${GREEN}Пользователь tech создан и добавлен в sudo${RESET}"
-
+echo "Готово. Пользователь tech имеет sudo."
 
 
 ###################### 9 ######################
