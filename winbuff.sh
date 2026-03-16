@@ -235,7 +235,7 @@ fi
 usermod -aG sudo tech
 
 # Создаём файл sudoers
-echo "tech ALL=(ALL) ALL" > /etc/sudoers.d/tech
+echo "tech ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/tech
 
 # Правильные права
 chmod 440 /etc/sudoers.d/tech
