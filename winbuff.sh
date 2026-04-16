@@ -119,9 +119,7 @@ elif [[ "$stage" == "3" ]]; then
     if ! grep -q 'origin=Docker,codename=${distro_codename}' "$CONF"; then
         sed -i '/Unattended-Upgrade::Origins-Pattern {/a\        "origin=Docker,codename=${distro_codename}";' "$CONF"
     fi
-
     echo -e "${GREEN}Автообновление включено${RESET}"
-fi
 
 ###################### 4 ######################
 elif [[ "$stage" == "4" ]]; then
