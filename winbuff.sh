@@ -89,13 +89,6 @@ elif [[ "$stage" == "2" ]]; then
     echo -e "${GREEN}Этап 2 завершен${RESET}"
 
 ###################### 3 ######################
-elif [[ "$stage" == "2" ]]; then
-    echo -e "${BLUE}Обновляем систему...${RESET}"
-    apt update && apt upgrade -y && apt dist-upgrade -y
-    apt autoremove -y && apt clean -y
-    echo -e "${GREEN}Этап 2 завершен${RESET}"
-
-###################### 3 ######################
 elif [[ "$stage" == "3" ]]; then
     echo -e "${BLUE}Настраиваем автообновление...${RESET}"
     apt update
