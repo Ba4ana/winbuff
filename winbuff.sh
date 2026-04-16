@@ -89,12 +89,12 @@ elif [[ "$stage" == "2" ]]; then
     echo -e "${GREEN}Этап 2 завершен${RESET}"
 
 ###################### 3 ######################
+
 elif [[ "$stage" == "3" ]]; then
     echo -e "${BLUE}Настраиваем автообновление...${RESET}"
     apt update
     apt install unattended-upgrades -y
     dpkg-reconfigure -f noninteractive unattended-upgrades
-
     CONF="/etc/apt/apt.conf.d/50unattended-upgrades"
     declare -A cfg=(
         ["Unattended-Upgrade::Remove-Unused-kernel-Packages"]="true"
@@ -104,12 +104,20 @@ elif [[ "$stage" == "3" ]]; then
     )
     for key in "${!cfg[@]}"; do
         if ! grep -q "$key" "$CONF"; then
-            echo "$key \"${cfg[$key]}\";" >> "$CONF"
+            echo "$key ${cfg[$key]};" >> "$CONF"
+        fi
+    done
+    # Добавляем origin'ы в блок Origins-Pattern
+    for origin in "Proxmox" "Docker" "Zabbix"; do
+        if ! grep -q "origin=${origin}" "$CONF"; then
+            sed -i "/Unattended-Upgrade::Origins-Pattern {/,/};/ s|};|        \"origin=${origin}\";\n};|" "$CONF"
         fi
     done
     echo -e "${GREEN}Автообновление включено${RESET}"
+fi
 
 ###################### 4 ######################
+
 elif [[ "$stage" == "4" ]]; then
     echo -e "${BLUE}Удаляем автообновление...${RESET}"
     systemctl stop unattended-upgrades.service
