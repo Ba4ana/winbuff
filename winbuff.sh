@@ -107,18 +107,6 @@ elif [[ "$stage" == "3" ]]; then
             echo "$key \"${cfg[$key]}\";" >> "$CONF"
         fi
     done
-
-    if ! grep -q 'origin=Proxmox,codename=${distro_codename}' "$CONF"; then
-        sed -i '/Unattended-Upgrade::Origins-Pattern {/a\        "origin=Proxmox,codename=${distro_codename}";' "$CONF"
-    fi
-
-    if ! grep -q 'origin=Zabbix,codename=${distro_codename}' "$CONF"; then
-        sed -i '/Unattended-Upgrade::Origins-Pattern {/a\        "origin=Zabbix,codename=${distro_codename}";' "$CONF"
-    fi
-
-    if ! grep -q 'origin=Docker,codename=${distro_codename}' "$CONF"; then
-        sed -i '/Unattended-Upgrade::Origins-Pattern {/a\        "origin=Docker,codename=${distro_codename}";' "$CONF"
-    fi
     echo -e "${GREEN}Автообновление включено${RESET}"
 
 ###################### 4 ######################
