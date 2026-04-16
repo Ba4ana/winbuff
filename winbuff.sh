@@ -42,7 +42,7 @@ while true; do
     echo -e "${YELLOW}4${RESET}  - Удаление автообновления"
     echo -e "${YELLOW}5${RESET}  - Установка Zabbix"
     echo -e "${YELLOW}6${RESET}  - Настройка eth0"
-    echo -e "${YELLOW}7${RESET}  - Обновление Debian 12 -> 13 (автоматически)"
+    echo -e "${YELLOW}7${RESET}  - Обновление Debian 12 -> 13"
     echo -e "${YELLOW}8${RESET}  - Создать пользователя tech"
     echo -e "${YELLOW}9${RESET}  - SFTP root"
     echo -e "${YELLOW}10${RESET} - Очистить историю"
@@ -89,12 +89,18 @@ elif [[ "$stage" == "2" ]]; then
     echo -e "${GREEN}Этап 2 завершен${RESET}"
 
 ###################### 3 ######################
+elif [[ "$stage" == "2" ]]; then
+    echo -e "${BLUE}Обновляем систему...${RESET}"
+    apt update && apt upgrade -y && apt dist-upgrade -y
+    apt autoremove -y && apt clean -y
+    echo -e "${GREEN}Этап 2 завершен${RESET}"
+
+###################### 3 ######################
 elif [[ "$stage" == "3" ]]; then
     echo -e "${BLUE}Настраиваем автообновление...${RESET}"
     apt update
     apt install unattended-upgrades -y
     dpkg-reconfigure -f noninteractive unattended-upgrades
-
     CONF="/etc/apt/apt.conf.d/50unattended-upgrades"
     declare -A cfg=(
         ["Unattended-Upgrade::Remove-Unused-kernel-Packages"]="true"
@@ -107,7 +113,17 @@ elif [[ "$stage" == "3" ]]; then
             echo "$key \"${cfg[$key]}\";" >> "$CONF"
         fi
     done
+    if ! grep -q 'origin=Proxmox' "$CONF"; then
+        sed -i '/Unattended-Upgrade::Origins-Pattern {/a\        "origin=Proxmox";' "$CONF"
+    fi
+    if ! grep -q 'origin=Zabbix' "$CONF"; then
+        sed -i '/Unattended-Upgrade::Origins-Pattern {/a\        "origin=Zabbix";' "$CONF"
+    fi
+    if ! grep -q 'origin=Docker' "$CONF"; then
+        sed -i '/Unattended-Upgrade::Origins-Pattern {/a\        "origin=Docker";' "$CONF"
+    fi
     echo -e "${GREEN}Автообновление включено${RESET}"
+fi
 
 ###################### 4 ######################
 elif [[ "$stage" == "4" ]]; then
