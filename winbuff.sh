@@ -103,14 +103,13 @@ elif [[ "$stage" == "3" ]]; then
         ["Unattended-Upgrade::Automatic-Reboot-Time"]="\"04:00\""
     )
     for key in "${!cfg[@]}"; do
-        if ! grep -q "$key" "$CONF"; then
+        if ! grep -qF "$key" "$CONF"; then
             echo "$key ${cfg[$key]};" >> "$CONF"
         fi
     done
-    # Добавляем origin'ы в блок Origins-Pattern
     for origin in "Proxmox" "Docker" "Zabbix"; do
-        if ! grep -q "origin=${origin}" "$CONF"; then
-            sed -i "/Unattended-Upgrade::Origins-Pattern {/,/};/ s|};|        \"origin=${origin}\";\n};|" "$CONF"
+        if ! grep -qF "\"origin=${origin}\";" "$CONF"; then
+            sed -i "/^Unattended-Upgrade::Origins-Pattern[[:space:]]*{/a\\        \"origin=${origin}\";" "$CONF"
         fi
     done
     echo -e "${GREEN}Автообновление включено${RESET}"
