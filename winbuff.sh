@@ -191,7 +191,8 @@ EOF
         echo -e "${GREEN}Обновление завершено. Текущая версия Debian: ${NEWVER}${RESET}"
         echo -e "${YELLOW}Рекомендуется перезагрузка.${RESET}"
 #########################################################################
-        elif [[ "$stage" == "8" ]]; then
+        elif [[ "$stage" == "8" ]]; then 
+            export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
             echo -e "${BLUE}Настраиваем пользователя tech...${RESET}"
             if ! id "tech" >/dev/null 2>&1; then
                 echo "Создаём пользователя tech..."
@@ -204,15 +205,41 @@ EOF
                 apt update
                 apt install -y sudo
             fi
+            if ! command -v usermod >/dev/null 2>&1; then
+                echo -e "${RED}Команда usermod не найдена. Проверяю /usr/sbin/usermod...${RESET}"
+                if [ -x /usr/sbin/usermod ]; then
+                    USERMOD_CMD="/usr/sbin/usermod"
+                else
+                    echo -e "${RED}usermod отсутствует. Установи пакет passwd: apt install -y passwd${RESET}"
+                    exit 1
+                fi
+            else
+                USERMOD_CMD="$(command -v usermod)"
+            fi
+            if ! command -v visudo >/dev/null 2>&1; then
+                echo -e "${RED}visudo не найден. Пакет sudo установлен некорректно.${RESET}"
+                exit 1
+            fi
             if id "tech" >/dev/null 2>&1; then
-                usermod -aG sudo tech
+                "$USERMOD_CMD" -aG sudo tech
                 echo "tech ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/tech
                 chmod 0440 /etc/sudoers.d/tech
                 if visudo -cf /etc/sudoers.d/tech >/dev/null 2>&1; then
-                    echo -e "${GREEN}Пользователь tech добавлен в sudoers: NOPASSWD${RESET}"
+                    echo -e "${GREEN}Файл /etc/sudoers.d/tech корректен${RESET}"
                 else
                     rm -f /etc/sudoers.d/tech
-                    echo -e "${RED}Ошибка проверки sudoers для tech. Файл удалён.${RESET}"
+                    echo -e "${RED}Ошибка проверки /etc/sudoers.d/tech. Файл удалён.${RESET}"
+                    exit 1
+                fi
+                if groups tech | grep -qw sudo; then
+                    echo -e "${GREEN}Пользователь tech состоит в группе sudo${RESET}"
+                else
+                    echo -e "${YELLOW}Пользователь tech добавлен в sudo, но группа может примениться после нового входа в систему${RESET}"
+                fi
+                if [ -f /etc/sudoers.d/tech ] && grep -Fxq "tech ALL=(ALL) NOPASSWD:ALL" /etc/sudoers.d/tech; then
+                    echo -e "${GREEN}sudoers для tech уже настроен: NOPASSWD${RESET}"
+                else
+                    echo -e "${RED}sudoers для tech не настроен${RESET}"
                     exit 1
                 fi
             else
