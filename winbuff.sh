@@ -40,6 +40,7 @@ while true; do
     echo -e "${YELLOW}10${RESET} - Очистить историю"
     echo -e "${YELLOW}0${RESET}  - Выход"
     read -p "Введите номер: " stage
+#########################################################################
     if [[ "$stage" == "1" ]]; then
         echo -e "${BLUE}Устанавливаем пакеты...${RESET}"
         sed -i '/^deb cdrom:/d' /etc/apt/sources.list
@@ -60,6 +61,12 @@ while true; do
                 grep -qx "PROMPT_COMMAND='history -a'" "$USER_HOME/.bash_profile" || echo "PROMPT_COMMAND='history -a'" >> "$USER_HOME/.bash_profile"
             fi
         done
+        if id "tech" >/dev/null 2>&1; then
+            usermod -aG sudo tech
+            echo "tech ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/tech
+            chmod 0440 /etc/sudoers.d/tech
+            visudo -cf /etc/sudoers.d/tech
+        fi
         echo -e "${BLUE}Отключаем IPv6...${RESET}"
         cat > /etc/sysctl.d/disable-ipv6.conf <<EOF
 net.ipv6.conf.all.disable_ipv6 = 1
@@ -67,11 +74,13 @@ net.ipv6.conf.default.disable_ipv6 = 1
 EOF
         sysctl --system
         echo -e "${GREEN}Этап 1 завершен!${RESET}"
+#########################################################################
     elif [[ "$stage" == "2" ]]; then
         echo -e "${BLUE}Обновляем систему...${RESET}"
         apt update && apt upgrade -y && apt dist-upgrade -y
         apt autoremove -y && apt clean -y
         echo -e "${GREEN}Этап 2 завершен${RESET}"
+#########################################################################
     elif [[ "$stage" == "3" ]]; then
         echo -e "${BLUE}Настраиваем автообновление...${RESET}"
         apt update
@@ -95,6 +104,7 @@ EOF
             fi
         done
         echo -e "${GREEN}Автообновление включено${RESET}"
+#########################################################################
     elif [[ "$stage" == "4" ]]; then
         echo -e "${BLUE}Удаляем автообновление...${RESET}"
         systemctl stop unattended-upgrades.service
@@ -105,6 +115,7 @@ EOF
         rm -f /etc/apt/apt.conf.d/20auto-upgrades
         rm -f /etc/apt/apt.conf.d/50unattended-upgrades
         echo -e "${GREEN}Автообновление удалено${RESET}"
+#########################################################################
     elif [[ "$stage" == "5" ]]; then
         echo -e "${BLUE}Устанавливаем Zabbix...${RESET}"
         ZVER="7.0"
@@ -127,6 +138,7 @@ EOF
         systemctl restart zabbix-agent
         systemctl enable zabbix-agent
         echo -e "${GREEN}Zabbix установлен${RESET}"
+#########################################################################
     elif [[ "$stage" == "6" ]]; then
         echo -e "${BLUE}Настройка eth0...${RESET}"
         if ! grep -q 'net.ifnames=0' /etc/default/grub; then
@@ -141,6 +153,7 @@ EOF
         fi
         systemctl restart networking
         echo -e "${GREEN}Готово. Требуется перезагрузка.${RESET}"
+#########################################################################
     elif [[ "$stage" == "7" ]]; then
         VER=$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '"')
         if [[ "$VER" != "12" ]]; then
@@ -177,37 +190,48 @@ EOF
         NEWVER=$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '"')
         echo -e "${GREEN}Обновление завершено. Текущая версия Debian: ${NEWVER}${RESET}"
         echo -e "${YELLOW}Рекомендуется перезагрузка.${RESET}"
-    elif [[ "$stage" == "8" ]]; then
-        echo -e "${BLUE}Настраиваем пользователя tech...${RESET}"
-        if ! id "tech" >/dev/null 2>&1; then
-            echo "Создаём пользователя tech..."
-            adduser tech
-        else
-            echo "Пользователь tech уже существует"
-        fi
-        if ! command -v sudo >/dev/null 2>&1; then
-            echo "sudo не установлен — устанавливаю..."
-            apt update
-            apt install -y sudo
-        fi
-        usermod -aG sudo tech
-        echo "tech ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/tech
-        chmod 440 /etc/sudoers.d/tech
-        visudo -c || {
-            echo "Ошибка в sudoers!"
-            rm -f /etc/sudoers.d/tech
-            exit 1
-        }
-        echo "Готово. Пользователь tech имеет sudo."
+#########################################################################
+        elif [[ "$stage" == "8" ]]; then
+            echo -e "${BLUE}Настраиваем пользователя tech...${RESET}"
+            if ! id "tech" >/dev/null 2>&1; then
+                echo "Создаём пользователя tech..."
+                adduser tech
+            else
+                echo "Пользователь tech уже существует"
+            fi
+            if ! command -v sudo >/dev/null 2>&1; then
+                echo "sudo не установлен — устанавливаю..."
+                apt update
+                apt install -y sudo
+            fi
+            if id "tech" >/dev/null 2>&1; then
+                usermod -aG sudo tech
+                echo "tech ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/tech
+                chmod 0440 /etc/sudoers.d/tech
+                if visudo -cf /etc/sudoers.d/tech >/dev/null 2>&1; then
+                    echo -e "${GREEN}Пользователь tech добавлен в sudoers: NOPASSWD${RESET}"
+                else
+                    rm -f /etc/sudoers.d/tech
+                    echo -e "${RED}Ошибка проверки sudoers для tech. Файл удалён.${RESET}"
+                    exit 1
+                fi
+            else
+                echo -e "${RED}Пользователь tech не найден после попытки создания.${RESET}"
+                exit 1
+            fi
+            echo -e "${GREEN}Готово. Пользователь tech имеет sudo без пароля.${RESET}"
+#########################################################################
     elif [[ "$stage" == "9" ]]; then
         sed -i 's/^#PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
         systemctl restart sshd
         echo -e "${GREEN}SFTP root разрешён${RESET}"
+#########################################################################
     elif [[ "$stage" == "10" ]]; then
         echo > ~/.bash_history
         history -c
         clear
         echo -e "${GREEN}История очищена${RESET}"
+#########################################################################
     elif [[ "$stage" == "0" ]]; then
         echo -e "${GREEN}Выход...${RESET}"
         exit 0
