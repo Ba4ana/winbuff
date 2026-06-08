@@ -196,7 +196,7 @@ EOF
             echo -e "${BLUE}Настраиваем пользователя tech...${RESET}"
             if ! id "tech" >/dev/null 2>&1; then
                 echo "Создаём пользователя tech..."
-                adduser tech
+                adduser --gecos "" tech
             else
                 echo "Пользователь tech уже существует"
             fi
