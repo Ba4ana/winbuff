@@ -30,7 +30,7 @@ def warn_and_pause(msg, seconds=10):
 
 
 def main():
-    vers = "0.6.3"
+    vers = "0.6.4"
     name = "_winbuff"
     main = os.path.join(r"C:\Windows", name)
     logs = os.path.join(main, "log")
@@ -85,8 +85,8 @@ def print_info(vers, name):
     print("=" * 64)
 
 def setup_7zip(adms):
-    seven_zip_display_version = "26.01"
-    seven_zip_download_version = "2601"
+    seven_zip_display_version = "26.02"
+    seven_zip_download_version = "2602"
 
     arch = platform.machine()
     if arch.endswith('64'):
