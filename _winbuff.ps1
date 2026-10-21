@@ -5,7 +5,7 @@ $ErrorActionPreference = 'SilentlyContinue'
 $ProgressPreference = 'SilentlyContinue'
 
 # Определение переменных
-$vers = "0.6.5"
+$vers = "0.6.6"
 $name = "_winbuff"
 $main = "$env:SystemRoot\$name"
 $logs = "$main\log"
@@ -62,8 +62,8 @@ if (!$brandmauer) {
 
 ## Установка 7-Zip
 # Версия 7-Zip
-$sevenZipDisplayVersion = "26.03"
-$sevenZipDownloadVersion = "2603"
+$sevenZipDisplayVersion = "26.04"
+$sevenZipDownloadVersion = "2604"
 
 # Определяем архитектуру ОС и соответствующий файл установщика
 $osArchitecture = (Get-WmiObject win32_operatingsystem).osarchitecture
