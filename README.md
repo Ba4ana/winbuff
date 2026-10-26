@@ -17,7 +17,6 @@
 | [`_winbuff.ps1`](_winbuff.ps1) | Аналогичный загрузчик для Windows PowerShell с дополнительной настройкой Execution Policy и правила брандмауэра. |
 | [`winbuff.sh`](winbuff.sh) | Интерактивное меню обслуживания Debian (пункты `0–10`). |
 | [`cheklist.md`](cheklist.md) | Исторический чек-лист Linux-настройки; **не** является точным описанием текущего `winbuff.sh`. |
-| [`.github/workflows/version-policy.yml`](.github/workflows/version-policy.yml) | GitHub Actions: проверка формата и последовательности версий в сообщениях коммитов. |
 | [`license.md`](license.md) | Лицензия MIT. |
 | `README.md` | Описание текущих возможностей и ограничений. |
 
