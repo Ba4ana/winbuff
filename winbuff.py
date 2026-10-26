@@ -85,8 +85,8 @@ def print_info(vers, name):
     print("=" * 64)
 
 def setup_7zip(adms):
-    seven_zip_display_version = "26.04"
-    seven_zip_download_version = "2604"
+    seven_zip_display_version = "26.05"
+    seven_zip_download_version = "2605"
 
     arch = platform.machine()
     if arch.endswith('64'):
