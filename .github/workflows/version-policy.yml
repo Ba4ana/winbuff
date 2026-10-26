@@ -1,0 +1,60 @@
+name: Version policy
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Проверить переход версии
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import re
+          import subprocess
+          import sys
+
+          pattern = re.compile(r"^v\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\s+\S.*$")
+          subjects = subprocess.check_output(
+              ["git", "log", "--format=%s"], text=True
+          ).splitlines()
+          if not subjects:
+              sys.exit("ERROR: empty Git history")
+          current = pattern.fullmatch(subjects[0])
+          if current is None:
+              sys.exit("ERROR: HEAD subject must be v.<major>.<minor>.<patch> description")
+          version = tuple(int(part) for part in current.groups()[:3])
+          if version[2] > 99:
+              sys.exit(f"ERROR: new patch must not exceed 99: {version}")
+          history = [
+              tuple(int(part) for part in match.groups()[:3])
+              for subject in subjects[1:]
+              if (match := pattern.fullmatch(subject))
+          ]
+          if not history:
+              print(f"PASS: first versioned commit {version}")
+              sys.exit(0)
+          previous = max(history)
+          if previous[2] >= 99:
+              expected = (previous[0], previous[1] + 1, 1)
+              valid = version == expected
+          else:
+              expected = (previous[0], previous[1], previous[2] + 1)
+              manual_release = (
+                  version[2] == 0
+                  and (version[0] > previous[0]
+                       or (version[0] == previous[0] and version[1] > previous[1]))
+              )
+              valid = version == expected or manual_release
+          if not valid:
+              sys.exit(f"ERROR: previous v{previous}; expected ordinary v{expected}, got v{version}")
+          print(f"PASS: v{previous} -> v{version}")
+          PY
