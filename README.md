@@ -1,5 +1,7 @@
 # winbuff
 
+**CI:** [статическая проверка GitHub Actions](.github/workflows/ci.yml) выполняет только `bash -n`, компиляцию Python в bytecode и синтаксический разбор PowerShell 5.1 без исполнения загрузчиков или установщиков. Публичный репозиторий использует GitHub-hosted Linux/Windows runners; постоянный `agent-ci-01` к недоверенным PR не подключается. Перенос возможен только после приёмки отдельного ephemeral executor по [общему runbook](https://github.com/Ba4ana/ai-passport/blob/main/docs/ci-runner-migration.md).
+
 Набор административных скриптов для подготовки и обслуживания Windows и Debian. Репозиторий содержит **два Windows-загрузчика** и **интерактивный Bash-скрипт**. Это не единый установочный пакет: часть Windows-логики доставляется отдельным архивом и не входит в Git.
 
 **Версия обоих Windows-загрузчиков в исходном коде:** `0.6.6`  
