@@ -169,11 +169,6 @@ EOF
         apt -y autoremove
         apt -y clean
         echo -e "${BLUE}Отключаем сторонние репозитории (если есть) и готовим sources.list...${RESET}"
-        mkdir -p /root/upgrade-backup
-        cp -a /etc/apt/sources.list /root/upgrade-backup/sources.list.$(date +%F_%H%M%S)
-        if [ -d /etc/apt/sources.list.d ]; then
-            tar -czf /root/upgrade-backup/sources.list.d.$(date +%F_%H%M%S).tgz /etc/apt/sources.list.d 2>/dev/null || true
-        fi
         if [ -d /etc/apt/sources.list.d ]; then
             find /etc/apt/sources.list.d -maxdepth 1 -type f -name "*.list" -exec mv -f {} {}.disabled \; 2>/dev/null || true
         fi
