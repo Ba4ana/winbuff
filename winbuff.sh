@@ -161,33 +161,55 @@ EOF
             sleep 5
             continue
         fi
+        upgrade_step() {
+            if ! "$@"; then
+                printf '%s\n' 'STOP: обновление прервано. Автоматический backup/rollback не выполняется; нужна диагностика.' >&2
+                exit 1
+            fi
+        }
+        # Не перезаписывать ранее отключённые источники APT.
+        for source in /etc/apt/sources.list.d/*.list; do
+            [[ -e "$source" || -L "$source" ]] || continue
+            if [[ -e "$source.disabled" || -L "$source.disabled" || -L "$source" || ! -f "$source" ]]; then
+                printf '%s\n' 'STOP: конфликт или небезопасный тип файла источника APT.' >&2
+                exit 1
+            fi
+        done
+        [[ -f /etc/apt/sources.list && ! -L /etc/apt/sources.list ]] || {
+            printf '%s\n' 'STOP: ожидается обычный файл /etc/apt/sources.list; нужна отдельная миграция APT.' >&2
+            exit 1
+        }
         echo -e "${BLUE}Подготовка: обновляем Debian 12 до актуального состояния...${RESET}"
         export DEBIAN_FRONTEND=noninteractive
-        apt update
-        apt -y upgrade
-        apt -y full-upgrade
-        apt -y autoremove
-        apt -y clean
+        upgrade_step apt update
+        upgrade_step apt -y upgrade
+        upgrade_step apt -y full-upgrade
+        upgrade_step apt -y autoremove
+        upgrade_step apt -y clean
         echo -e "${BLUE}Отключаем сторонние репозитории (если есть) и готовим sources.list...${RESET}"
-        mkdir -p /root/upgrade-backup
-        cp -a /etc/apt/sources.list /root/upgrade-backup/sources.list.$(date +%F_%H%M%S)
         if [ -d /etc/apt/sources.list.d ]; then
-            tar -czf /root/upgrade-backup/sources.list.d.$(date +%F_%H%M%S).tgz /etc/apt/sources.list.d 2>/dev/null || true
+            for source in /etc/apt/sources.list.d/*.list; do
+                [[ -e "$source" || -L "$source" ]] || continue
+                [[ ! -e "$source.disabled" && ! -L "$source.disabled" && ! -L "$source" && -f "$source" ]] || exit 1
+                upgrade_step mv -T --no-clobber -- "$source" "$source.disabled"
+                [[ ! -e "$source" && ! -L "$source" && -f "$source.disabled" ]] || exit 1
+            done
         fi
-        if [ -d /etc/apt/sources.list.d ]; then
-            find /etc/apt/sources.list.d -maxdepth 1 -type f -name "*.list" -exec mv -f {} {}.disabled \; 2>/dev/null || true
-        fi
-        sed -i 's/bookworm/trixie/g' /etc/apt/sources.list
-        sed -i 's/Bookworm/Trixie/g' /etc/apt/sources.list
-        sed -i '/^deb cdrom:/d' /etc/apt/sources.list
+        upgrade_step sed -i 's/bookworm/trixie/g' /etc/apt/sources.list
+        upgrade_step sed -i 's/Bookworm/Trixie/g' /etc/apt/sources.list
+        upgrade_step sed -i '/^deb cdrom:/d' /etc/apt/sources.list
         echo -e "${BLUE}Обновляем списки пакетов для Debian 13 (trixie)...${RESET}"
-        apt update
+        upgrade_step apt update
         echo -e "${BLUE}Выполняем dist-upgrade (full-upgrade) до Debian 13...${RESET}"
-        apt -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" full-upgrade
+        upgrade_step apt -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" full-upgrade
         echo -e "${BLUE}Чистим систему...${RESET}"
-        apt -y autoremove
-        apt -y clean
+        upgrade_step apt -y autoremove
+        upgrade_step apt -y clean
         NEWVER=$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '"')
+        [[ "$NEWVER" == "13" ]] || {
+            printf '%s\n' 'STOP: Debian 13 не подтверждён; нужна диагностика без автоматического rollback.' >&2
+            exit 1
+        }
         echo -e "${GREEN}Обновление завершено. Текущая версия Debian: ${NEWVER}${RESET}"
         echo -e "${YELLOW}Рекомендуется перезагрузка.${RESET}"
 #########################################################################

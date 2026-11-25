@@ -18,6 +18,8 @@ jobs:
         run: bash -n winbuff.sh
       - name: Check Python syntax only
         run: python3 -m py_compile winbuff.py
+      - name: Check Debian upgrade safety contract
+        run: python3 -m unittest discover -s tests -p 'test_p0_law04.py' -v
   powershell-parser:
     runs-on: windows-latest
     timeout-minutes: 10
